@@ -43,9 +43,12 @@ numpy==1.26.4
     #   mediapipe
     #   ml-dtypes
     #   opencv-contrib-python
+    #   opencv-python
     #   scipy
 opencv-contrib-python==4.10.0.84
     # via mediapipe
+opencv-python==4.10.0.84
+    # via -r requirements.in
 opt-einsum==3.4.0
     # via jax
 packaging==24.1
