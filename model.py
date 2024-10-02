@@ -20,10 +20,10 @@ def show_using_matplot_lib(image, result):
     plt.imshow(image_array)
     # Add text information on the image.
     # (x, y) coordinates are in pixels. Set (x, y) relative to the size of the image.
-    plt.text(50, 50, f'Gesture: {result}', fontsize=16, color='red', weight='bold')
+    plt.text(50, 50, f'Gesture: {result["category"]}', fontsize=16, color='red', weight='bold')
 
     # Optionally add more text or details.
-    plt.text(50, 100, 'Confidence: 0.95', fontsize=14, color='blue')
+    plt.text(50, 100, f'Confidence: {result["confidence"]}', fontsize=14, color='blue')
 
     plt.axis('off')  # Hide axis.
     plt.show()
@@ -43,14 +43,30 @@ def resize_and_show(image, result):
     cv2.destroyAllWindows()
 
 
+def construct_show_result(result):
+    if len(result) == 0:
+        return {
+            'category': 'unknown',
+            'confidence': 0
+        }
+
+    category_name = result[0].category_name
+    confidence = result[0].score
+    return {
+        'category': category_name,
+        'confidence': confidence
+    }
+
+
 def display_batch_of_images_with_gestures_and_hand_landmarks(images_with_results):
     # Preview the images.
     # images = {name: cv2.imread(name) for name in IMAGE_FILENAMES}
-    breakpoint()
+    # breakpoint()
     for _, details in images_with_results.items():
         image = details['image']
-        category_name = details['result'][0].category_name
-        show_using_matplot_lib(image, category_name)
+        result = details['result']
+        show_result = construct_show_result(result)
+        show_using_matplot_lib(image, show_result)
         # resize_and_show(image, category_name)
 
 
