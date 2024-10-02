@@ -4,9 +4,30 @@ import cv2
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import math
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 DESIRED_HEIGHT = 480
 DESIRED_WIDTH = 480
+
+
+def show_using_matplot_lib(image, result):
+    # Convert the MediaPipe image to a NumPy array.
+    image_array = np.array(image.numpy_view(), dtype=np.uint8)
+
+    # Display the image using matplotlib (which uses RGB format).
+    plt.imshow(image_array)
+    # Add text information on the image.
+    # (x, y) coordinates are in pixels. Set (x, y) relative to the size of the image.
+    plt.text(50, 50, f'Gesture: {result}', fontsize=16, color='red', weight='bold')
+
+    # Optionally add more text or details.
+    plt.text(50, 100, 'Confidence: 0.95', fontsize=14, color='blue')
+
+    plt.axis('off')  # Hide axis.
+    plt.show()
+
 
 def resize_and_show(image, result):
     h, w = image.shape[:2]
@@ -21,14 +42,16 @@ def resize_and_show(image, result):
     # Close all OpenCV windows.
     cv2.destroyAllWindows()
 
-def display_batch_of_images_with_gestures_and_hand_landmarks(images, results):
+
+def display_batch_of_images_with_gestures_and_hand_landmarks(images_with_results):
     # Preview the images.
-    images = {name: cv2.imread(name) for name in IMAGE_FILENAMES}
+    # images = {name: cv2.imread(name) for name in IMAGE_FILENAMES}
     breakpoint()
-    for name, image in zip(images.items(), results):
-        print(name)
-        print(result)
-        resize_and_show(image, result)
+    for _, details in images_with_results.items():
+        image = details['image']
+        category_name = details['result'][0].category_name
+        show_using_matplot_lib(image, category_name)
+        # resize_and_show(image, category_name)
 
 
 IMAGE_FILENAMES = ['images/basic_images/thumbs_down.jpg', 'images/basic_images/victory.jpg', 'images/basic_images/thumbs_up.jpg', 'images/basic_images/pointing_up.jpg']
@@ -57,4 +80,4 @@ for count, image_file_name in enumerate(IMAGE_FILENAMES):
     results.append((top_gesture, hand_landmarks))
     images_with_result[count]['result'] = (top_gesture, hand_landmarks)
 
-display_batch_of_images_with_gestures_and_hand_landmarks(images, results)
+display_batch_of_images_with_gestures_and_hand_landmarks(images_with_result)
