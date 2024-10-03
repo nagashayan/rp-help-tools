@@ -1,4 +1,7 @@
 # STEP 1: Import the necessary modules.
+import os
+from pathlib import Path
+from typing import List
 import mediapipe as mp
 import cv2
 from mediapipe.tasks import python
@@ -23,7 +26,7 @@ def show_using_matplot_lib(image, result):
     plt.text(50, 50, f'Gesture: {result["category"]}', fontsize=16, color='red', weight='bold')
 
     # Optionally add more text or details.
-    plt.text(50, 100, f'Confidence: {result["confidence"]}', fontsize=14, color='blue')
+    plt.text(50, 100, f'Confidence: {result["confidence"]}', fontsize=14, color='red', weight='bold')
 
     plt.axis('off')  # Hide axis.
     plt.show()
@@ -70,8 +73,19 @@ def display_batch_of_images_with_gestures_and_hand_landmarks(images_with_results
         # resize_and_show(image, category_name)
 
 
-IMAGE_FILENAMES = ['images/basic_images/thumbs_down.jpg', 'images/basic_images/victory.jpg', 'images/basic_images/thumbs_up.jpg', 'images/basic_images/pointing_up.jpg']
+def get_image_extensions() -> tuple:
+    image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff')
+    return image_extensions
 
+
+def get_images_filenames() -> List:
+    folder_path =  Path('images/basic_images')
+    image_extensions = get_image_extensions()
+    image_filenames = [str(f) for f in folder_path.glob('*') if f.suffix.lower() in image_extensions]
+    return image_filenames
+
+
+IMAGE_FILENAMES = get_images_filenames()
 
 # STEP 2: Create an GestureRecognizer object.
 base_options = python.BaseOptions(model_asset_path='gesture_recognizer.task')
