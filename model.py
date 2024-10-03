@@ -32,20 +32,6 @@ def show_using_matplot_lib(image, result):
     plt.show()
 
 
-def resize_and_show(image, result):
-    h, w = image.shape[:2]
-    if h < w:
-        img = cv2.resize(image, (DESIRED_WIDTH, math.floor(h/(w/DESIRED_WIDTH))))
-    else:
-        img = cv2.resize(image, (math.floor(w/(h/DESIRED_HEIGHT)), DESIRED_HEIGHT))
-    cv2.imshow(f'Image Display:{result}', img)
-    # Wait for a key press indefinitely or for a specific time in milliseconds.
-    cv2.waitKey(0)  # 0 means wait indefinitely until a key is pressed.
-
-    # Close all OpenCV windows.
-    cv2.destroyAllWindows()
-
-
 def construct_show_result(result):
     if len(result) == 0:
         return {
@@ -70,7 +56,6 @@ def display_batch_of_images_with_gestures_and_hand_landmarks(images_with_results
         result = details['result']
         show_result = construct_show_result(result)
         show_using_matplot_lib(image, show_result)
-        # resize_and_show(image, category_name)
 
 
 def get_image_extensions() -> tuple:
