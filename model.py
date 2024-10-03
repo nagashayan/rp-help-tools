@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from typing import List
 import mediapipe as mp
-import cv2
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import math
@@ -49,8 +48,6 @@ def construct_show_result(result):
 
 def display_batch_of_images_with_gestures_and_hand_landmarks(images_with_results):
     # Preview the images.
-    # images = {name: cv2.imread(name) for name in IMAGE_FILENAMES}
-    # breakpoint()
     for _, details in images_with_results.items():
         image = details['image']
         result = details['result']
