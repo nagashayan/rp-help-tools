@@ -66,12 +66,20 @@ def get_image_extensions() -> tuple:
     return image_extensions
 
 
+def get_image_folders() -> List:
+    folder_paths = [Path("images/basic_images"), Path("images/shake")]
+    return folder_paths
+
+
 def get_images_filenames() -> List:
-    folder_path = Path("images/basic_images")
+    folder_paths = get_image_folders()
     image_extensions = get_image_extensions()
-    image_filenames = [
-        str(f) for f in folder_path.glob("*") if f.suffix.lower() in image_extensions
-    ]
+    image_filenames = []
+    for folder in folder_paths:
+        filenames = [
+            str(f) for f in folder.glob("*") if f.suffix.lower() in image_extensions
+        ]
+        image_filenames.append(filenames)
     return image_filenames
 
 
