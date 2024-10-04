@@ -79,7 +79,7 @@ def get_images_filenames() -> List:
         filenames = [
             str(f) for f in folder.glob("*") if f.suffix.lower() in image_extensions
         ]
-        image_filenames.append(filenames)
+        image_filenames.extend(filenames)
     return image_filenames
 
 
@@ -103,6 +103,9 @@ for count, image_file_name in enumerate(IMAGE_FILENAMES):
     # STEP 5: Process the result. In this case, visualize it.
     images.append(image)
     images_with_result[count] = {"image": image}
+    if len(recognition_result.gestures) == 0:
+        images_with_result[count]["result"] = []
+        continue
     top_gesture = recognition_result.gestures[0][0]
     hand_landmarks = recognition_result.hand_landmarks
     results.append((top_gesture, hand_landmarks))

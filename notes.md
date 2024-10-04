@@ -1,3 +1,11 @@
+# Program flow
+Run recognizer.py
+    - It will iterate through all folders under images/
+        - Iterate through all images under each folder and create a Path list
+    - We will feed each image to gesture recognizer model
+    - Add each result to dictionary (result, image)
+    - Process above dictionary and feed into matplot lib to show image along with result.
+
 
 # About datasets
 
