@@ -1,8 +1,8 @@
 # rp-help-tools
 
 # Setup
-python3 -m venv .env
-source .env/bin/activate
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install pip-tools
 pip-compile --output-file=requirements.txt requirements.in
 pip-sync requirements.txt
