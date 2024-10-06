@@ -164,6 +164,7 @@ cython_debug/
 # ml models
 *.task
 images/
+update_model/v1/
 
 # vscode
 .vscode/

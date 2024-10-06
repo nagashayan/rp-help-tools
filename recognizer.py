@@ -86,7 +86,8 @@ def get_images_filenames() -> List:
 IMAGE_FILENAMES = get_images_filenames()
 
 # STEP 2: Create an GestureRecognizer object.
-base_options = python.BaseOptions(model_asset_path="gesture_recognizer.task")
+# base_options = python.BaseOptions(model_asset_path="gesture_recognizer.task")
+base_options = python.BaseOptions(model_asset_path="update_model/v1/gesture_recognizer.task")
 options = vision.GestureRecognizerOptions(base_options=base_options)
 recognizer = vision.GestureRecognizer.create_from_options(options)
 

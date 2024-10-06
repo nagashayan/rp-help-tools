@@ -21,6 +21,8 @@ There are several datasets and resources available for human gesture and pose im
 ### 1. **MediaPipe Gesture Recognizer Dataset**
    - The [MediaPipe Gesture Recognizer](https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer) offers some basic gestures for use with their models. They also provide sample images for each gesture (like thumbs up, thumbs down, etc.). You can explore their documentation or GitHub repositories for accessing sample images.
 
+    RPS dataset: wget https://storage.googleapis.com/mediapipe-tasks/gesture_recognizer/rps_data_sample.zip
+
 ### 2. **EgoHands Dataset**
    - [EgoHands](http://vision.soic.indiana.edu/projects/egohands/) is a dataset that contains 48 Google Glass videos of complex, first-person interactions between two people. It includes labeled hand segmentation and gesture annotations, making it useful for gesture recognition.
 
