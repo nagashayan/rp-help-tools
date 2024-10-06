@@ -6,6 +6,13 @@ Run recognizer.py
     - Add each result to dictionary (result, image)
     - Process above dictionary and feed into matplot lib to show image along with result.
 
+# About labeling
+
+pip install label-studio
+label-studio start my_project --init
+
+Another option:
+https://www.robots.ox.ac.uk/~vgg/software/via/via_demo.html
 
 # About datasets
 
