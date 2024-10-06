@@ -4,7 +4,7 @@ import json
 import tensorflow as tf
 assert tf.__version__.startswith('2')
 
-from mediapipe_model_maker import object_detector
+from mediapipe_model_maker import gesture_recognizer
 
 
 # !wget https://storage.googleapis.com/mediapipe-tasks/object_detector/android_figurine.zip
