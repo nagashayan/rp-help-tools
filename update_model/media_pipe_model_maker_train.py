@@ -6,7 +6,7 @@ assert tf.__version__.startswith('2')
 from mediapipe_model_maker import gesture_recognizer
 
 
-dataset_path = "../images/train_dataset"
+dataset_path = "../images/train_dataset_v2"
 print(dataset_path)
 
 data = gesture_recognizer.Dataset.from_folder(
