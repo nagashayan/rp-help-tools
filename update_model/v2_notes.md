@@ -14,3 +14,20 @@ because the embedded stage, considers one hand and then inputs it to secondary s
 
 Conclusion:
 So we gotta find a model which works with two hands and accepts movement.
+one potential model is "Hand Landmark Detection"
+    - low light training
+    - when two hands join it fails, which should be okay?
+
+- Openpose
+
+Comparision:
+| Feature                     | **OpenPose**                                 | **MediaPipe Hand Tracking**                        |
+|-----------------------------|----------------------------------------------|---------------------------------------------------|
+| **Purpose**                  | Full-body pose, hand, face tracking          | Specialized hand tracking and finger gestures     |
+| **Keypoints Detected**       | 21 keypoints per hand (plus body/face)       | 21 keypoints per hand (fingers, joints, palm)     |
+| **Architecture**             | Bottom-up, multi-stage CNN with PAFs         | Top-down, lightweight neural network              |
+| **Performance**              | Real-time on high-end devices, slower on low-end | Real-time on most devices, optimized for mobile/web|
+| **Ease of Use**              | More complex setup, requires GPU             | Easy to integrate, supports mobile and web        |
+| **Use Case**                 | Full-body and multi-person tracking          | Hand-centric applications (e.g., sign language)   |
+| **Multi-Person Support**     | Yes (full-body)                              | Yes (multi-hand, but no body tracking)            |
+| **Platforms**                | Cross-platform, but heavy                    | Mobile, web, desktop with excellent performance   |
