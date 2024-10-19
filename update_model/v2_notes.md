@@ -31,3 +31,30 @@ Comparision:
 | **Use Case**                 | Full-body and multi-person tracking          | Hand-centric applications (e.g., sign language)   |
 | **Multi-Person Support**     | Yes (full-body)                              | Yes (multi-hand, but no body tracking)            |
 | **Platforms**                | Cross-platform, but heavy                    | Mobile, web, desktop with excellent performance   |
+
+Lets stick to gesture recognition, I have been generating lot of images using LLMs and myown dataset to train.
+Also found this in model card:
+https://storage.googleapis.com/mediapipe-assets/gesture_recognizer/model_card_hand_gesture_classification_with_faireness_2022.pdf
+
+
+    This model was trained and evaluated from the hand
+    landmarks output data from MediaPipe Hands Model.
+    This classication model does not directly use any
+    images or videos as inputs.
+
+so its better if we input images to hands model and then take output from there and train this model? I think so.
+
+The way hands model works summarized from this link:
+https://mediapipe.readthedocs.io/en/latest/solutions/hands.html
+https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
+
+1. The palm detection model is run to extract only the hand part (identification, scaling etc)
+2. The hand landmark recognizer performs precise keypoint localization of 21 3D hand-knucle coordinates inside the detected hand regions via regression, that is direct coordinate prediction.
+
+hands model is nothing but hand landmark model here:
+https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
+
+The pipeline for V2 model should be:
+- Use hand_landmark.task to detect 21 3D points of a hand from our dataset
+- Take the output from above step and input it to our new model
+- Train the new model
