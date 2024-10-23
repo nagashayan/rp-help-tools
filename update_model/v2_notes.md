@@ -264,3 +264,118 @@ It seems that the current model can handle simpler gestures but may need to be s
 # V2.2
 Hypothesis:
 - More none category than primary gesture might avoid overfitting? because v2.1 had the same pattern.
+
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ hand_embedding (InputLayer  [(None, 128)]             0         
+ )                                                               
+                                                                 
+ batch_normalization (Batch  (None, 128)               512       
+ Normalization)                                                  
+                                                                 
+ re_lu (ReLU)                (None, 128)               0         
+                                                                 
+ dropout (Dropout)           (None, 128)               0         
+                                                                 
+ custom_gesture_recognizer_  (None, 2)                 258       
+ out (Dense)                                                     
+                                                                 
+=================================================================
+Total params: 770 (3.01 KB)
+Trainable params: 514 (2.01 KB)
+Non-trainable params: 256 (1.00 KB)
+_________________________________________________________________
+None
+Epoch 1/10
+55/55 [==============================] - 3s 27ms/step - loss: 0.2069 - categorical_accuracy: 0.6545 - val_loss: 0.0801 - val_categorical_accuracy: 0.8571 - lr: 0.0010
+Epoch 2/10
+55/55 [==============================] - 1s 16ms/step - loss: 0.1866 - categorical_accuracy: 0.6909 - val_loss: 0.0871 - val_categorical_accuracy: 0.9286 - lr: 9.9000e-04
+Epoch 3/10
+55/55 [==============================] - 1s 20ms/step - loss: 0.1554 - categorical_accuracy: 0.7727 - val_loss: 0.1088 - val_categorical_accuracy: 0.7143 - lr: 9.8010e-04
+Epoch 4/10
+55/55 [==============================] - 1s 16ms/step - loss: 0.1464 - categorical_accuracy: 0.7727 - val_loss: 0.1107 - val_categorical_accuracy: 0.7143 - lr: 9.7030e-04
+Epoch 5/10
+55/55 [==============================] - 1s 16ms/step - loss: 0.1440 - categorical_accuracy: 0.7909 - val_loss: 0.1146 - val_categorical_accuracy: 0.7143 - lr: 9.6060e-04
+Epoch 6/10
+55/55 [==============================] - 1s 15ms/step - loss: 0.1354 - categorical_accuracy: 0.7818 - val_loss: 0.1163 - val_categorical_accuracy: 0.7143 - lr: 9.5099e-04
+Epoch 7/10
+55/55 [==============================] - 1s 17ms/step - loss: 0.1226 - categorical_accuracy: 0.8182 - val_loss: 0.1138 - val_categorical_accuracy: 0.7143 - lr: 9.4148e-04
+Epoch 8/10
+55/55 [==============================] - 1s 16ms/step - loss: 0.1412 - categorical_accuracy: 0.7636 - val_loss: 0.1015 - val_categorical_accuracy: 0.7857 - lr: 9.3207e-04
+Epoch 9/10
+55/55 [==============================] - 1s 18ms/step - loss: 0.1225 - categorical_accuracy: 0.7636 - val_loss: 0.1098 - val_categorical_accuracy: 0.7143 - lr: 9.2274e-04
+Epoch 10/10
+55/55 [==============================] - 1s 14ms/step - loss: 0.1127 - categorical_accuracy: 0.8000 - val_loss: 0.1038 - val_categorical_accuracy: 0.7143 - lr: 9.1352e-04
+14/14 [==============================] - 1s 6ms/step - loss: 0.1402 - categorical_accuracy: 0.6429
+Test loss:0.1402260959148407, Test accuracy:0.6428571343421936
+
+ChatGPT remarks:
+Final Test Performance:
+After training, the model is evaluated on a test set, showing:
+Test Loss: 0.1402
+Test Accuracy: 64.29%
+This accuracy is lower than the validation accuracy, indicating that the model has some issues generalizing to new data. It might still be overfitting or not fully capturing the underlying patterns of the task.
+Summary:
+The model starts with promising results but appears to hit a plateau, and performance slightly drops as training progresses, especially on validation and test sets. This is likely due to overfitting, which might be addressed with techniques such as more regularization, tuning hyperparameters, or collecting more data.
+
+Compare v2 vs v2.2
+The two model training outputs, version **v2** and version **v2.2**, exhibit several key differences and insights that highlight variations in performance, overfitting tendencies, and generalization capability.
+
+### Key Similarities:
+- **Model Architecture**: Both versions share the same architecture. They have an input layer (`hand_embedding`) of size 128, followed by a batch normalization layer, a ReLU activation, a dropout layer, and an output dense layer with 2 units (likely for binary classification).
+  - Total Parameters: 770 (514 trainable, 256 non-trainable) for both.
+  
+- **Training Configuration**: Both models train for 10 epochs with similar learning rate schedules that decrease slightly across epochs.
+
+### Key Differences:
+#### 1. **Initial Model Performance (Epoch 1)**:
+   - **v2.2**:
+     - **Loss**: 0.2069
+     - **Accuracy**: 65.45%
+     - **Validation Accuracy**: 85.71%
+   - **v2**:
+     - **Loss**: 0.4987
+     - **Accuracy**: 33.33%
+     - **Validation Accuracy**: 75.00%
+   
+   **Insight**: Version **v2.2** starts with much better accuracy and a lower loss, indicating it learned faster in the initial epoch. In contrast, version **v2** struggles, beginning with poor training accuracy and a high loss, but the validation accuracy is high, suggesting the model might have learned some useful patterns.
+
+#### 2. **Accuracy Trends**:
+   - **v2.2**:
+     - **Final Training Accuracy**: 80.00%
+     - **Final Validation Accuracy**: 71.43% (dropped significantly after the first epoch)
+   - **v2**:
+     - **Final Training Accuracy**: 93.33%
+     - **Final Validation Accuracy**: 75.00% (remained constant from Epoch 1)
+
+   **Insight**: 
+   - In **v2.2**, the training accuracy increases but the validation accuracy decreases from an initial high, which suggests **overfitting** (the model memorizes training data but struggles with generalization). 
+   - In **v2**, the validation accuracy stays stable at 75%, but the training accuracy increases significantly (93.33%). This suggests that **v2** might still have some overfitting but generalizes slightly better based on validation performance.
+
+#### 3. **Loss Trends**:
+   - **v2.2**:
+     - **Final Training Loss**: 0.1127
+     - **Final Validation Loss**: 0.1038
+   - **v2**:
+     - **Final Training Loss**: 0.0648
+     - **Final Validation Loss**: 0.4804
+
+   **Insight**: The lower final training loss in **v2** suggests the model fit the training data better, but the validation loss remains significantly higher, indicating **v2** struggles more with generalization, as seen by the relatively high validation loss compared to **v2.2**. However, **v2.2** shows a more balanced training and validation loss, despite a plateau in validation accuracy.
+
+#### 4. **Test Performance**:
+   - **v2.2**:
+     - **Test Loss**: 0.1402
+     - **Test Accuracy**: 64.29%
+   - **v2**:
+     - **Test Loss**: 1.2402
+     - **Test Accuracy**: 50.00%
+
+   **Insight**: Version **v2.2** performs much better on the test set, achieving a test accuracy of 64.29% and a much lower loss (0.1402) compared to **v2**, which has a high test loss (1.2402) and only 50% accuracy. This indicates that **v2.2** generalizes better to unseen data, while **v2** suffers from poor generalization and overfitting, as seen in the test performance.
+
+### Conclusion:
+- **v2.2** has better overall generalization and maintains a reasonable balance between training and validation performance, though it does exhibit some overfitting after the first epoch.
+- **v2**, despite achieving higher training accuracy, struggles with generalization, as indicated by its high validation and test losses, along with its poor test accuracy. This model likely overfits to the training data and fails to perform well on unseen data.
+
+In summary, **v2.2** is the superior model for generalization, while **v2** shows signs of strong overfitting, performing poorly on new data despite good training accuracy.
