@@ -143,3 +143,124 @@ To improve, consider:
 Adding more data or diversifying the training data.
 Tweaking the model architecture by adding layers or adjusting regularization techniques.
 Early stopping or more epochs with proper validation tracking.
+
+# V2.1
+In this trial, I want to train using RPS (Rock paper scissor) dataset but use only rock and none.
+I also kept only 30 images limited dataset to see if we can reproduce earlier problem:
+- if it is limited dataset is the problem
+- or is it too complicated/too many features and requires much more deep models.
+
+we will be using rps_data_sample_experiment dataset for this experiment.
+
+../images/rps_data_sample_experiment
+Using existing files at /var/folders/vm/s5xwrxd93_xbnhp70qvyw03w0000gq/T/model_maker/gesture_recognizer/palm_detection_full.tflite
+Using existing files at /var/folders/vm/s5xwrxd93_xbnhp70qvyw03w0000gq/T/model_maker/gesture_recognizer/hand_landmark_full.tflite
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1729686170.668226  677483 gl_context.cc:357] GL version: 2.1 (2.1 INTEL-22.5.12), renderer: Intel(R) UHD Graphics 617
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1729686170.731214  677979 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1729686170.771229  677978 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1729686170.847824  677979 landmark_projection_calculator.cc:186] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.11/site-packages/google/protobuf/symbol_database.py:55: UserWarning: SymbolDatabase.GetPrototype() is deprecated. Please use message_factory.GetMessageClass() instead. SymbolDatabase.GetPrototype() will be removed soon.
+  warnings.warn('SymbolDatabase.GetPrototype() is deprecated. Please '
+Using existing files at /var/folders/vm/s5xwrxd93_xbnhp70qvyw03w0000gq/T/model_maker/gesture_recognizer/gesture_embedder
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ hand_embedding (InputLayer  [(None, 128)]             0         
+ )                                                               
+                                                                 
+ batch_normalization (Batch  (None, 128)               512       
+ Normalization)                                                  
+                                                                 
+ re_lu (ReLU)                (None, 128)               0         
+                                                                 
+ dropout (Dropout)           (None, 128)               0         
+                                                                 
+ custom_gesture_recognizer_  (None, 2)                 258       
+ out (Dense)                                                     
+                                                                 
+=================================================================
+Total params: 770 (3.01 KB)
+Trainable params: 514 (2.01 KB)
+Non-trainable params: 256 (1.00 KB)
+_________________________________________________________________
+None
+Epoch 1/10
+56/56 [==============================] - 3s 24ms/step - loss: 0.1610 - categorical_accuracy: 0.7054 - val_loss: 0.1000 - val_categorical_accuracy: 0.8571 - lr: 0.0010
+Epoch 2/10
+56/56 [==============================] - 1s 15ms/step - loss: 0.1347 - categorical_accuracy: 0.7768 - val_loss: 0.1338 - val_categorical_accuracy: 0.6429 - lr: 9.9000e-04
+Epoch 3/10
+56/56 [==============================] - 1s 17ms/step - loss: 0.1272 - categorical_accuracy: 0.8304 - val_loss: 0.1268 - val_categorical_accuracy: 0.7143 - lr: 9.8010e-04
+Epoch 4/10
+56/56 [==============================] - 1s 20ms/step - loss: 0.0994 - categorical_accuracy: 0.8393 - val_loss: 0.1498 - val_categorical_accuracy: 0.7143 - lr: 9.7030e-04
+Epoch 5/10
+56/56 [==============================] - 1s 16ms/step - loss: 0.1110 - categorical_accuracy: 0.8482 - val_loss: 0.1308 - val_categorical_accuracy: 0.7143 - lr: 9.6060e-04
+Epoch 6/10
+56/56 [==============================] - 1s 17ms/step - loss: 0.1039 - categorical_accuracy: 0.8393 - val_loss: 0.1257 - val_categorical_accuracy: 0.7143 - lr: 9.5099e-04
+Epoch 7/10
+56/56 [==============================] - 1s 17ms/step - loss: 0.1061 - categorical_accuracy: 0.8214 - val_loss: 0.1324 - val_categorical_accuracy: 0.7143 - lr: 9.4148e-04
+Epoch 8/10
+56/56 [==============================] - 1s 18ms/step - loss: 0.0854 - categorical_accuracy: 0.8393 - val_loss: 0.1445 - val_categorical_accuracy: 0.7143 - lr: 9.3207e-04
+Epoch 9/10
+56/56 [==============================] - 1s 15ms/step - loss: 0.0905 - categorical_accuracy: 0.8571 - val_loss: 0.1286 - val_categorical_accuracy: 0.7143 - lr: 9.2274e-04
+Epoch 10/10
+56/56 [==============================] - 1s 15ms/step - loss: 0.0893 - categorical_accuracy: 0.8571 - val_loss: 0.1156 - val_categorical_accuracy: 0.7143 - lr: 9.1352e-04
+15/15 [==============================] - 1s 3ms/step - loss: 0.0472 - categorical_accuracy: 1.0000
+Test loss:0.0472198948264122, Test accuracy:1.0
+
+ChatGPT remarks:
+The output you provided contains information about a training process for a Mediapipe gesture recognizer. Here's an interpretation of the key components:
+
+Model Information:
+
+The model includes an input layer for hand embeddings with 128 features, followed by a batch normalization layer, a ReLU activation layer, a dropout layer, and a final dense layer (classifier) with 2 output units. This indicates a simple feed-forward neural network used for classification.
+The total number of parameters in the model is 770, with 514 being trainable.
+Training and Validation Performance:
+
+You trained the model for 10 epochs. The categorical_accuracy and val_categorical_accuracy refer to the accuracy on the training and validation sets, respectively.
+Starting from Epoch 1, the training accuracy is relatively low at 70.5%, but it improves steadily to reach 85.7% by Epoch 10. The loss also decreases over time, suggesting the model is learning effectively.
+Validation accuracy fluctuates around 71.4% after Epoch 3, indicating some potential overfitting, as the model's performance on the training set improves more than on the validation set.
+Key Metrics:
+
+Training accuracy: The model achieves 85.7% categorical accuracy by the end of training, meaning it's correctly classifying around 86% of the gestures in the training data.
+Validation accuracy: It stabilizes around 71.4%, which might suggest that the model struggles to generalize to new, unseen data or that the validation set is particularly challenging.
+Test accuracy: When evaluated on the test set, the model achieves 100% accuracy (categorical_accuracy: 1.0) with a very low test loss (0.0472). This suggests that the model performs extremely well on the test set.
+Potential Issues:
+
+Feedback manager warning: There is a warning about disabling support for feedback tensors due to a requirement for a single signature inference. This likely won't affect the final results but could be important depending on the specific application of the model.
+Overfitting: The training accuracy significantly surpasses validation accuracy after a few epochs. The validation accuracy plateaus around 71%, while training accuracy keeps improving, suggesting overfitting.
+Validation performance: The validation accuracy is not improving as much as expected, so the model might benefit from further tuning, such as regularization, early stopping, or using more data for validation.
+Summary:
+The model is learning effectively on the training data and performs exceptionally well on the test set.
+However, the relatively low and stable validation accuracy compared to training accuracy suggests potential overfitting, and the model may struggle with generalization.
+
+ChatGPT remarks on our hypothesis that its not low data but complex features in handhake compared to paper gesture is the
+problem.
+
+From the output of the second experiment, where you trained the model on the "paper" gesture with the same number of images, a few important observations can be made that help evaluate the initial hypothesis regarding gesture complexity:
+
+### Key Results:
+- **Test Accuracy**: The model achieves **100% accuracy** on the test data for the "paper" gesture, suggesting it is able to classify this gesture perfectly.
+- **Validation Accuracy**: The model maintains a **validation accuracy around 71.43%**, which is somewhat lower than the test accuracy, but still decent.
+- **Training Performance**: The model performs consistently well, reaching **85.71% categorical accuracy** by the 10th epoch, with a very low **test loss of 0.0472**.
+
+### Comparison with "Handshake" Gesture Training:
+- In the earlier experiment with the "handshake" gesture, the model achieved **50% test accuracy**, which is essentially random guessing for a binary classification task.
+- On the "paper" gesture, the model achieves **100% test accuracy**, suggesting it can easily distinguish between the two classes for this gesture.
+  
+### Interpretation:
+- **Gesture Complexity**: It seems that the "handshake" gesture is indeed more complex or harder to recognize than the "paper" gesture. The model can learn and classify simpler gestures like "paper" effectively with a shallow architecture.
+- **Overfitting**: Overfitting is less likely the primary issue here since the model generalizes well for the "paper" gesture. The fact that the model struggles with the "handshake" gesture indicates that the issue is more likely related to the complexity of the gesture.
+
+### Conclusion:
+The experiment supports the hypothesis that the **"handshake" gesture likely requires a deeper or more complex neural network architecture** for better performance. You may need to:
+1. **Increase model complexity** (e.g., by adding more layers, units, or using more advanced architectures like convolutional layers for better feature extraction).
+2. **Improve gesture representation** by using more training data or augmenting the existing dataset to better capture the intricacies of the "handshake" gesture.
+
+It seems that the current model can handle simpler gestures but may need to be scaled up to accommodate more nuanced hand shapes like "handshake."
+
+# V2.2
+Hypothesis:
+- More none category than primary gesture might avoid overfitting? because v2.1 had the same pattern.
