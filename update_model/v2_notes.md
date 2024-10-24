@@ -339,7 +339,7 @@ The two model training outputs, version **v2** and version **v2.2**, exhibit sev
      - **Loss**: 0.4987
      - **Accuracy**: 33.33%
      - **Validation Accuracy**: 75.00%
-   
+
    **Insight**: Version **v2.2** starts with much better accuracy and a lower loss, indicating it learned faster in the initial epoch. In contrast, version **v2** struggles, beginning with poor training accuracy and a high loss, but the validation accuracy is high, suggesting the model might have learned some useful patterns.
 
 #### 2. **Accuracy Trends**:
@@ -379,3 +379,5 @@ The two model training outputs, version **v2** and version **v2.2**, exhibit sev
 - **v2**, despite achieving higher training accuracy, struggles with generalization, as indicated by its high validation and test losses, along with its poor test accuracy. This model likely overfits to the training data and fails to perform well on unseen data.
 
 In summary, **v2.2** is the superior model for generalization, while **v2** shows signs of strong overfitting, performing poorly on new data despite good training accuracy.
+
+How to test these models in realtime like the one google shows? lets try that.

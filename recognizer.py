@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import List
 
+import cv2
 import matplotlib.pyplot as plt
 import mediapipe as mp
 import numpy as np
@@ -67,7 +68,8 @@ def get_image_extensions() -> tuple:
 
 
 def get_image_folders() -> List:
-    folder_paths = [Path("images/basic_images"), Path("images/shake")]
+    # folder_paths = [Path("images/basic_images"), Path("images/handshake")]
+    folder_paths = [Path("images/train_dataset_v2_hand_only/handshake")]
     return folder_paths
 
 
@@ -87,16 +89,22 @@ IMAGE_FILENAMES = get_images_filenames()
 
 # STEP 2: Create an GestureRecognizer object.
 # base_options = python.BaseOptions(model_asset_path="gesture_recognizer.task")
-base_options = python.BaseOptions(model_asset_path="update_model/v1/gesture_recognizer.task")
+base_options = python.BaseOptions(
+    model_asset_path="update_model/v2_2/gesture_recognizer.task"
+)
 options = vision.GestureRecognizerOptions(base_options=base_options)
 recognizer = vision.GestureRecognizer.create_from_options(options)
 
 images = []
 results = []
 images_with_result = {}
-for count, image_file_name in enumerate(IMAGE_FILENAMES):
+for count, image_file_name in enumerate(IMAGE_FILENAMES[:5]):
+    cv_img = cv2.imread(image_file_name)
+    image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv_img)
+
     # STEP 3: Load the input image.
-    image = mp.Image.create_from_file(image_file_name)
+    # There was a image loading issue so I used above cv2
+    # image = mp.Image.create_from_file(image_file_name)
 
     # STEP 4: Recognize gestures in the input image.
     recognition_result = recognizer.recognize(image)

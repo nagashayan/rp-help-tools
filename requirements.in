@@ -1,5 +1,6 @@
 mediapipe==0.10.15
 requests
+opencv-contrib-python
 
 # Development
 tox
