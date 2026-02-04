@@ -38,3 +38,19 @@ See cnn_model_trainer.py
    - **Threshold for Consistent Detection**: Accumulate predictions over multiple frames to confirm a gesture and reduce false positives.
 
 This setup should allow you to deploy a handshake detection system in real-time.
+
+# V3.1
+
+- Used chatgpt to fix overfititng problem.
+- It recognized data imbalance between handshake and no handshake so using weightes
+- Preprocessing data
+- Freezing and unfreezing model to retrain model for better accuracy.
+
+Key Improvements
+✅ Better Augmentation: Stronger data augmentation for better generalization.
+✅ Class Weight Handling: Addresses the data imbalance issue.
+✅ Fine-Tuning MobileNetV2: The base model is first frozen, then unfrozen for additional training.
+✅ Dropout Regularization: Prevents overfitting.
+✅ Batch Size Increased: From 8 to 32 for stability.
+
+This should significantly improve your model’s ability to recognize handshakes. Let me know if you need any tweaks! 🚀
