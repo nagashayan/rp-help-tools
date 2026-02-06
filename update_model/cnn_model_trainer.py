@@ -16,7 +16,7 @@ def combined_preprocessing(img):
 # Update the datagen
 datagen = ImageDataGenerator(
     preprocessing_function=combined_preprocessing,
-    brightness_range=[0.4, 1.2]
+    brightness_range=[0.4, 1.2],
     rotation_range=20,
     width_shift_range=0.15,
     height_shift_range=0.15,

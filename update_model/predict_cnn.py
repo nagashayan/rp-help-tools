@@ -51,8 +51,8 @@ while cap.isOpened():
     avg_conf = sum(prediction_queue) / len(prediction_queue)
     positive_frames = sum(1 for p in prediction_queue if p > THRESHOLD)
     consistency = positive_frames / len(prediction_queue)
-
-    if consistency >= MIN_CONSISTENCY:
+    # This method suppresses transient false negatives and ensures that the assistive alert is only triggered by persistent initiatory gestures".
+    if consistency >= MIN_CONSISTENCY and avg_conf > 0.5:
         label = "VERIFIED"
         color = (0, 255, 0)
     else:
