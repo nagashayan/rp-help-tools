@@ -20,14 +20,14 @@ model = tf.keras.models.load_model("handshake_model.keras")
 
 # Configuration
 WINDOW_SIZE = 10 
-THRESHOLD = 0.7   
-MIN_CONSISTENCY = 0.8 
+THRESHOLD = 0.65  # Lowered slightly because Fusion is more robust
 prediction_queue = deque(maxlen=WINDOW_SIZE)
 
 # Persistence Configuration
 STABILITY_HISTORY = 15  
 coord_history = deque(maxlen=STABILITY_HISTORY)
-STABILITY_THRESHOLD = 0.012  # Adjustable: lower is stricter
+# Range of movement allowed (Standard Deviation)
+MAX_STABILITY_STD = 0.020 
 
 def get_kinematic_score(landmarks):
     tip_y = landmarks[8].y
@@ -52,7 +52,7 @@ while cap.isOpened():
     detection_result = detector.detect_for_video(mp_image, timestamp)
 
     k_score = 0
-    is_still = False
+    p_score = 0 # Persistence Score
     
     if detection_result.hand_landmarks:
         current_landmarks = detection_result.hand_landmarks[0]
@@ -65,8 +65,11 @@ while cap.isOpened():
         if len(coord_history) == STABILITY_HISTORY:
             std_x = np.std([c[0] for c in coord_history])
             std_y = np.std([c[1] for c in coord_history])
-            # Hand is 'still' if coordinate variance is below threshold
-            is_still = (std_x < STABILITY_THRESHOLD and std_y < STABILITY_THRESHOLD)
+            avg_std = (std_x + std_y) / 2
+            
+            # Soft Scoring: Persistence reward proportional to stillness
+            # If avg_std is 0.005 (very still), p_score is high. If 0.02 (moving), p_score is 0.
+            p_score = np.clip(1.0 - (avg_std / MAX_STABILITY_STD), 0, 1)
     else:
         coord_history.clear()
 
@@ -77,23 +80,37 @@ while cap.isOpened():
     img_cnn = np.expand_dims(img_cnn, axis=0)
     cnn_raw = model.predict(img_cnn, verbose=0)[0][0]
 
-    # Decision Fusion with Persistence
-    fused_pred = (0.5 * cnn_raw) + (0.5 * k_score)
+# --- STEP 4: 3-WAY FUSION LOGIC ---
+    # CNN (50%) + Kinematics (30%) + Persistence (20%)
+    fused_pred = (0.5 * cnn_raw) + (0.3 * k_score) + (0.2 * p_score)
     prediction_queue.append(fused_pred)
-    
     avg_conf = sum(prediction_queue) / len(prediction_queue)
+
+    # --- DIAGNOSTIC DASHBOARD ---
+    # Create a background for better readability for low-vision users
+    cv2.rectangle(frame, (5, 5), (450, 220), (0, 0, 0), -1)
     
-    # State Logic: Only Verify if Fused Score is high AND Hand is Stationary
-    if avg_conf > THRESHOLD and is_still:
+    # Define color-coded thresholds (Green if contributing well, Red if low)
+    c_color = (0, 255, 0) if cnn_raw > 0.5 else (0, 0, 255)
+    k_color = (0, 255, 0) if k_score > 0.5 else (0, 0, 255)
+    p_color = (0, 255, 0) if p_score > 0.5 else (0, 0, 255)
+
+    # Render individual scores
+    cv2.putText(frame, f"CNN (Pixels): {cnn_raw:.2f}", (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, c_color, 2)
+    cv2.putText(frame, f"Kinematic (Pose): {k_score:.2f}", (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.8, k_color, 2)
+    cv2.putText(frame, f"Persistence (Still): {p_score:.2f}", (15, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.8, p_color, 2)
+    cv2.putText(frame, f"TOTAL FUSED: {avg_conf:.2f}", (15, 180), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
+
+    # Final Decision Output
+    if avg_conf > THRESHOLD and p_score > 0.6:
         label, color = "VERIFIED: WAITING", (0, 255, 0)
-    elif avg_conf > THRESHOLD and not is_still:
-        label, color = "Hand Detected: Keep Still", (0, 255, 255) # Yellow warning
+    elif avg_conf > THRESHOLD:
+        label, color = "Stabilizing...", (0, 255, 255)
     else:
         label, color = "Scanning...", (0, 0, 255)
 
-    cv2.putText(frame, f"{label} ({avg_conf:.2f})", (10, 80),
-                cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 3)
-    cv2.imshow("Handshake Fusion with Persistence", frame)
+    cv2.putText(frame, label, (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 3)
+    cv2.imshow("Handshake 3-Way Fusion", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 

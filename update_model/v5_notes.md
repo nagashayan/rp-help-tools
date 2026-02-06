@@ -135,3 +135,92 @@ The more they weight, the weight should increase more?
 
 Lets decrease cnn to 0.5 and increase kinematic to 0.5
 
+Add another fusion (persistance) and assigned weights to it
+currently cnn: 50%, kinematic: 30%, persistance: 20%
+
+still cnn is draging score so we will add few images where it is scoring low to handshake category
+
+
+python cnn_model_trainer.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Found 71 images belonging to 2 classes.
+Found 16 images belonging to 2 classes.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/keras/src/trainers/data_adapters/py_dataset_adapter.py:121: UserWarning: Your `PyDataset` class should call `super().__init__(**kwargs)` in its constructor. `**kwargs` can include `workers`, `use_multiprocessing`, `max_queue_size`. Do not pass these arguments to `fit()`, as they will be ignored.
+  self._warn_if_super_not_called()
+Epoch 1/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 6s 1s/step - accuracy: 0.4848 - loss: 0.9535 - val_accuracy: 0.6250 - val_loss: 0.6065
+Epoch 2/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 861ms/step - accuracy: 0.6482 - loss: 0.8290 - val_accuracy: 0.7500 - val_loss: 0.4687
+Epoch 3/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 812ms/step - accuracy: 0.5767 - loss: 0.8390 - val_accuracy: 0.6875 - val_loss: 0.5159
+Epoch 4/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 760ms/step - accuracy: 0.6059 - loss: 0.7507 - val_accuracy: 0.6250 - val_loss: 0.5897
+Epoch 5/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7798 - loss: 0.5153 - val_accuracy: 0.6875 - val_loss: 0.4818
+Epoch 6/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 728ms/step - accuracy: 0.6761 - loss: 0.6498 - val_accuracy: 0.6875 - val_loss: 0.5575
+Epoch 7/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 804ms/step - accuracy: 0.6758 - loss: 0.5434 - val_accuracy: 0.6250 - val_loss: 0.5180
+Epoch 8/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 726ms/step - accuracy: 0.7623 - loss: 0.5190 - val_accuracy: 0.6250 - val_loss: 0.5493
+Epoch 9/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.8074 - loss: 0.4631 - val_accuracy: 0.6875 - val_loss: 0.4806
+Epoch 10/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 735ms/step - accuracy: 0.7748 - loss: 0.4933 - val_accuracy: 0.6875 - val_loss: 0.4631
+Epoch 11/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.8215 - loss: 0.4033 - val_accuracy: 0.6875 - val_loss: 0.5321
+Epoch 12/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 714ms/step - accuracy: 0.8097 - loss: 0.4319 - val_accuracy: 0.7500 - val_loss: 0.4336
+Epoch 13/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.8636 - loss: 0.4204 - val_accuracy: 0.6875 - val_loss: 0.4734
+Epoch 14/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 794ms/step - accuracy: 0.8245 - loss: 0.3938 - val_accuracy: 0.7500 - val_loss: 0.4641
+Epoch 15/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7243 - loss: 0.7709 - val_accuracy: 0.8125 - val_loss: 0.4146
+Epoch 1/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 17s 2s/step - accuracy: 0.5134 - loss: 0.9726 - val_accuracy: 0.8125 - val_loss: 0.3978
+Epoch 2/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7238 - loss: 0.7173 - val_accuracy: 0.8125 - val_loss: 0.4241
+Epoch 3/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.6974 - loss: 0.6349 - val_accuracy: 0.8125 - val_loss: 0.3897
+Epoch 4/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 782ms/step - accuracy: 0.7076 - loss: 0.5914 - val_accuracy: 0.8125 - val_loss: 0.4308
+Epoch 5/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 798ms/step - accuracy: 0.6372 - loss: 0.6334 - val_accuracy: 0.7500 - val_loss: 0.4514
+Epoch 6/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.6700 - loss: 0.6157 - val_accuracy: 0.7500 - val_loss: 0.3898
+Epoch 7/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7547 - loss: 0.4631 - val_accuracy: 0.8125 - val_loss: 0.3928
+Epoch 8/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.6688 - loss: 0.5875 - val_accuracy: 0.8750 - val_loss: 0.3610
+Epoch 9/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7035 - loss: 0.5715 - val_accuracy: 0.8125 - val_loss: 0.4596
+Epoch 10/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 783ms/step - accuracy: 0.7342 - loss: 0.5419 - val_accuracy: 0.7500 - val_loss: 0.4261
+Epoch 11/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7466 - loss: 0.5535 - val_accuracy: 0.9375 - val_loss: 0.3278
+Epoch 12/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7119 - loss: 0.5546 - val_accuracy: 0.7500 - val_loss: 0.3776
+Epoch 13/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 845ms/step - accuracy: 0.6513 - loss: 0.6488 - val_accuracy: 0.8750 - val_loss: 0.3951
+Epoch 14/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.6842 - loss: 0.5922 - val_accuracy: 0.8125 - val_loss: 0.3254
+Epoch 15/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 2s/step - accuracy: 0.7166 - loss: 0.4886 - val_accuracy: 0.8125 - val_loss: 0.4307
+Model training complete!
+1/1 ━━━━━━━━━━━━━━━━━━━━ 1s 1s/step
+Precision: 0.3333
+Recall: 0.1667
+F1-Score: 0.2222
+Specificity: 0.8000
+
+plot8.png
+
+
+also kinematic is too liberal, can we identify vertical fingers vs horizontal? 
+currently highfi is scoring 100% of kinematic (20%).
+
+This addition allows you to move your paper from "handshake detection" to "Social Gesture Discrimination".Geometrical Feature Engineering: You are no longer just using a "black box"; you are using Spatial Vector Analysis to define the handshake.Discriminating Similar Gestures: In your Methodology, you can write: "To eliminate false positives from horizontal gestures like 'High-Fives' or 'Waves,' we implemented a spatial slope check on the index finger vector ($\vec{V}_{5 \to 8}$). Only gestures maintaining a primary vertical axis in the sagittal plane are processed by the fusion layer".
+
+Let's add landmark mapping to see what is going on.
