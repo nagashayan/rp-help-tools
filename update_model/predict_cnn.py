@@ -35,18 +35,23 @@ STABILITY_HISTORY = 15
 coord_history = deque(maxlen=STABILITY_HISTORY)
 MAX_STABILITY_STD = 0.020 
 
-def get_kinematic_score(landmarks):
-    tip_y = landmarks[8].y
-    knuckle_y = landmarks[5].y
-    # Note: For horizontal handshake, 'straightness' might be x-based, 
-    # but strictly speaking, finger curling is still best checked relatively.
-    # We will stick to the V-distance check for openness.
+def get_pointing_vector(landmarks):
+    """
+    Calculates if the hand is pointing towards the camera (Z-axis).
+    """
+    # Wrist is Landmark 0
+    wrist = landmarks[0]
     
-    thumb_tip = np.array([landmarks[4].x, landmarks[4].y])
-    index_mcp = np.array([landmarks[5].x, landmarks[5].y])
-    v_dist = np.linalg.norm(thumb_tip - index_mcp)
+    # Index Tip is Landmark 8, Middle Tip is 12. 
+    # Using Middle Tip is often more stable for "hand direction".
+    finger_tip = landmarks[12] 
     
-    return 1.0 if (v_dist > 0.08) else 0.2
+    # MediaPipe Z: Negative values are closer to the camera.
+    # We want "Reach": How much closer is the tip than the wrist?
+    # Example: Wrist Z=0, Tip Z=-0.15 (Closer). Reach = 0.15
+    reach_z = wrist.z - finger_tip.z 
+    
+    return reach_z
 
 cap = cv2.VideoCapture(0)
 
@@ -63,8 +68,9 @@ while cap.isOpened():
     # Initialize variables
     k_score = 0
     p_score = 0
-    orientation_label = "No Hand"
-    is_handshake_orientation = False 
+    vector_label = "No Hand"
+    reach_val = 0.0
+    is_pointing_at_camera = False
     
     if detection_result.hand_landmarks:
         current_landmarks = detection_result.hand_landmarks[0]
@@ -79,26 +85,33 @@ while cap.isOpened():
             cv2.line(frame, p1, p2, (255, 0, 255), 2)
             cv2.circle(frame, p1, 4, (0, 255, 0), -1)
 
-        # --- UPDATED ORIENTATION LOGIC: Horizontal Dominance ---
-        # Pixel coordinates
-        p5_x, p5_y = current_landmarks[5].x * w, current_landmarks[5].y * h
-        p8_x, p8_y = current_landmarks[8].x * w, current_landmarks[8].y * h
+        # --- Z-VECTOR ANALYSIS (Pointing Towards You) ---
+        reach_val = get_pointing_vector(current_landmarks)
         
-        dx = abs(p8_x - p5_x)
-        dy = abs(p8_y - p5_y)
+        # Threshold Logic:
+        # reach_val < 0.05: Hand is flat (High Five, Salute, Stop Sign)
+        # reach_val > 0.10: Hand is reaching out (Handshake, Pointing)
+        is_pointing_at_camera = reach_val > 0.08 # Adjusted threshold for "Reach"
         
-        # LOGIC FLIP: Handshake is when X-diff is bigger than Y-diff
-        # We use a slight multiplier (0.8) to allow for a slightly diagonal natural shake
-        is_handshake_orientation = dx > (dy * 0.8)
-        
-        orientation_label = "Horizontal (Handshake)" if is_handshake_orientation else "Vertical (High-Five/Stop)"
-        
-        # --- HARD VETO: If Vertical, KILL the score ---
-        base_k_score = get_kinematic_score(current_landmarks)
-        if is_handshake_orientation:
-            k_score = base_k_score
+        if is_pointing_at_camera:
+            vector_label = f"Reaching Forward (Z={reach_val:.2f})"
         else:
-            k_score = 0.0 # Force rejection if vertical
+            vector_label = f"Flat/Vertical (Z={reach_val:.2f})"
+
+        # --- KINEMATIC SCORE ---
+        # 1. Base Openness Check (V-Angle)
+        thumb_tip = np.array([current_landmarks[4].x, current_landmarks[4].y])
+        index_mcp = np.array([current_landmarks[5].x, current_landmarks[5].y])
+        v_dist = np.linalg.norm(thumb_tip - index_mcp)
+        is_open = v_dist > 0.08
+        
+        # 2. HARD GATES
+        if not is_pointing_at_camera:
+            k_score = 0.0 # Reject if not pointing at person
+        elif not is_open:
+            k_score = 0.0 # Reject if thumb is tucked (Fist pointing)
+        else:
+            k_score = 1.0 # Perfect handshake candidate
 
         # Persistence Tracking
         wrist = current_landmarks[0]
@@ -124,12 +137,11 @@ while cap.isOpened():
     # Dashboard Overlay
     cv2.rectangle(frame, (5, 5), (350, 160), (0, 0, 0), -1)
     cv2.putText(frame, f"CNN: {cnn_raw:.2f}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
-    cv2.putText(frame, f"Pose: {k_score:.2f}", (15, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    cv2.putText(frame, f"Pose (Z-Reach): {k_score:.2f}", (15, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
     cv2.putText(frame, f"Still: {p_score:.2f}", (15, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
     
-    # Color code orientation label
-    o_color = (0, 255, 0) if is_handshake_orientation else (0, 0, 255) # Red if Vertical (Rejected)
-    cv2.putText(frame, orientation_label, (15, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, o_color, 1)
+    v_color = (0, 255, 0) if is_pointing_at_camera else (0, 0, 255)
+    cv2.putText(frame, vector_label, (15, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, v_color, 1)
 
     if avg_conf > THRESHOLD and p_score > 0.6:
         label, color = "VERIFIED: WAITING", (0, 255, 0)
@@ -139,7 +151,7 @@ while cap.isOpened():
         label, color = "Scanning...", (0, 0, 255)
 
     cv2.putText(frame, label, (10, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
-    cv2.imshow("Handshake Horizontal Logic", frame)
+    cv2.imshow("Handshake Z-Vector Logic", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 

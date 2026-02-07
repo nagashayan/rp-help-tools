@@ -224,3 +224,10 @@ currently highfi is scoring 100% of kinematic (20%).
 This addition allows you to move your paper from "handshake detection" to "Social Gesture Discrimination".Geometrical Feature Engineering: You are no longer just using a "black box"; you are using Spatial Vector Analysis to define the handshake.Discriminating Similar Gestures: In your Methodology, you can write: "To eliminate false positives from horizontal gestures like 'High-Fives' or 'Waves,' we implemented a spatial slope check on the index finger vector ($\vec{V}_{5 \to 8}$). Only gestures maintaining a primary vertical axis in the sagittal plane are processed by the fusion layer".
 
 Let's add landmark mapping to see what is going on.
+
+We only consider pose if the hand is in horizontal position else it's stop/highfi symbol.
+
+can we consider z-index so that we can diff between salute and handshake since both can have thumb in V shape it's tricky
+
+Cool I think I solved most of the common issues.
+Time to publish?
