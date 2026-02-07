@@ -38,13 +38,15 @@ MAX_STABILITY_STD = 0.020
 def get_kinematic_score(landmarks):
     tip_y = landmarks[8].y
     knuckle_y = landmarks[5].y
-    is_straight = tip_y < knuckle_y
+    # Note: For horizontal handshake, 'straightness' might be x-based, 
+    # but strictly speaking, finger curling is still best checked relatively.
+    # We will stick to the V-distance check for openness.
     
     thumb_tip = np.array([landmarks[4].x, landmarks[4].y])
     index_mcp = np.array([landmarks[5].x, landmarks[5].y])
     v_dist = np.linalg.norm(thumb_tip - index_mcp)
     
-    return 1.0 if (is_straight and v_dist > 0.08) else 0.2
+    return 1.0 if (v_dist > 0.08) else 0.2
 
 cap = cv2.VideoCapture(0)
 
@@ -62,7 +64,7 @@ while cap.isOpened():
     k_score = 0
     p_score = 0
     orientation_label = "No Hand"
-    is_vertical = False 
+    is_handshake_orientation = False 
     
     if detection_result.hand_landmarks:
         current_landmarks = detection_result.hand_landmarks[0]
@@ -77,26 +79,26 @@ while cap.isOpened():
             cv2.line(frame, p1, p2, (255, 0, 255), 2)
             cv2.circle(frame, p1, 4, (0, 255, 0), -1)
 
-        # --- UPDATED ORIENTATION LOGIC (Pixel-Perfect) ---
-        # Convert to pixel coordinates to handle aspect ratio correctly
+        # --- UPDATED ORIENTATION LOGIC: Horizontal Dominance ---
+        # Pixel coordinates
         p5_x, p5_y = current_landmarks[5].x * w, current_landmarks[5].y * h
         p8_x, p8_y = current_landmarks[8].x * w, current_landmarks[8].y * h
         
         dx = abs(p8_x - p5_x)
         dy = abs(p8_y - p5_y)
         
-        # Stricter Check: dy must be significantly larger than dx
-        # This filters out diagonal 45-degree waves
-        is_vertical = dy > (dx * 1.2) 
+        # LOGIC FLIP: Handshake is when X-diff is bigger than Y-diff
+        # We use a slight multiplier (0.8) to allow for a slightly diagonal natural shake
+        is_handshake_orientation = dx > (dy * 0.8)
         
-        orientation_label = "Vertical (Handshake)" if is_vertical else "Horizontal (High-Five)"
+        orientation_label = "Horizontal (Handshake)" if is_handshake_orientation else "Vertical (High-Five/Stop)"
         
-        # --- HARD VETO: If not vertical, KILL the score ---
+        # --- HARD VETO: If Vertical, KILL the score ---
         base_k_score = get_kinematic_score(current_landmarks)
-        if is_vertical:
+        if is_handshake_orientation:
             k_score = base_k_score
         else:
-            k_score = 0.0 # Force rejection
+            k_score = 0.0 # Force rejection if vertical
 
         # Persistence Tracking
         wrist = current_landmarks[0]
@@ -125,7 +127,8 @@ while cap.isOpened():
     cv2.putText(frame, f"Pose: {k_score:.2f}", (15, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
     cv2.putText(frame, f"Still: {p_score:.2f}", (15, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
     
-    o_color = (0, 255, 0) if is_vertical else (0, 0, 255) # Red if rejected
+    # Color code orientation label
+    o_color = (0, 255, 0) if is_handshake_orientation else (0, 0, 255) # Red if Vertical (Rejected)
     cv2.putText(frame, orientation_label, (15, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, o_color, 1)
 
     if avg_conf > THRESHOLD and p_score > 0.6:
@@ -136,7 +139,7 @@ while cap.isOpened():
         label, color = "Scanning...", (0, 0, 255)
 
     cv2.putText(frame, label, (10, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
-    cv2.imshow("Handshake Hard-Gate Logic", frame)
+    cv2.imshow("Handshake Horizontal Logic", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 
