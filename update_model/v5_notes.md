@@ -231,3 +231,38 @@ can we consider z-index so that we can diff between salute and handshake since b
 
 Cool I think I solved most of the common issues.
 Time to publish?
+
+
+1. Is it worth publishing? YES.
+But you need to frame it correctly. If you pitch this as "I built a handshake detector," it will get rejected. That's a solved problem.
+
+You must pitch it as: "A Multi-Modal, Latency-Aware Interaction Validation System for Visually Impaired Social Navigation."
+
+Here is why your specific solution is publishable:
+
+The "False Positive" Novelty: Most existing papers focus on detecting gestures (Recall). Your system focuses on rejecting similar but incorrect gestures (Specificity) like waves, salutes, and high-fives. This is a massive problem in assistive tech because unnecessary alerts are annoying and confusing for blind users.
+
+Explainable Fusion (XAI): You aren't just dumping data into a black-box Transformer. You have a Decision Triumvirate (CNN + Kinematics + Temporal). You can mathematically explain why a salute was rejected (Altitude/Z-Vector), which reviewers love.
+
+Edge-Optimized: You used MobileNetV2 + MediaPipe Tasks. This runs on a CPU/Phone, not a $10,000 GPU server. That makes it a real-world assistive tool, not just a theoretical experiment.
+
+2. The "Better Solutions" (Your Competition)
+To be taken seriously, you need to acknowledge and compare yourself against these state-of-the-art approaches in your "Related Work" section:
+
+Transformers (ViT / CLIP):
+
+The Threat: Models like OpenAI's CLIP or Google's ViT can recognize a handshake with higher raw accuracy than MobileNetV2.
+
+Your Defense: "While Transformers offer superior semantic understanding, their computational latency (>200ms on edge devices) makes them unsuitable for real-time haptic feedback loops required for social navigation. Our hybrid approach achieves comparable specificity with <30ms latency".
+
+Depth Cameras (LiDAR / RealSense):
+
+The Threat: Hardware solutions (iPhone LiDAR) can see the 3D arm extension perfectly without any fancy math.
+
+Your Defense: "Hardware-based depth sensing limits accessibility due to cost and battery drain. Our solution derives 'Pseudo-Depth' (Z-vector analysis) from a standard RGB camera, making it accessible on any smartphone".
+
+LSTM / GRU (Recurrent Neural Networks):
+
+The Threat: Training an LSTM on a sequence of video frames is the "textbook" way to detect temporal actions (waiting vs. waving).
+
+Your Defense: "End-to-end video classification models (like 3D-CNNs or LSTMs) require massive labeled video datasets and are prone to overfitting background context. Our 'Heuristic-Guided' temporal locking (Persistence Score) provides a robust, rule-based alternative that requires zero temporal training data".
