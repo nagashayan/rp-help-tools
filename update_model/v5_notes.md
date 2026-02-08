@@ -266,3 +266,102 @@ LSTM / GRU (Recurrent Neural Networks):
 The Threat: Training an LSTM on a sequence of video frames is the "textbook" way to detect temporal actions (waiting vs. waving).
 
 Your Defense: "End-to-end video classification models (like 3D-CNNs or LSTMs) require massive labeled video datasets and are prone to overfitting background context. Our 'Heuristic-Guided' temporal locking (Persistence Score) provides a robust, rule-based alternative that requires zero temporal training data".
+
+"We deliberately chose geometric heuristics over learned temporal features to ensure deterministic failure modes. If the system rejects a handshake, it is guaranteed to be because of lack of arm extension ($Z < 0.08$) or excessive altitude ($Y < 0.45$), rather than an opaque neural network error."
+
+we are using train_dataset_v2 so far.
+
+
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 2s/step - accuracy: 0.7629 - loss: 0.4919 - val_accuracy: 0.7778 - val_loss: 0.5015
+Epoch 15/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 920ms/step - accuracy: 0.7786 - loss: 0.5419 - val_accuracy: 0.7222 - val_loss: 0.4559
+Model training complete!
+1/1 ━━━━━━━━━━━━━━━━━━━━ 1s 1s/step
+Precision: 0.6667
+Recall: 0.2857
+F1-Score: 0.4000
+Specificity: 0.9091
+(.venv) nagashayanaramamurthy@MacBook-Pro update_model % python predict_cnn.py      
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1770467337.427483 6678695 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1770467337.437756 6678696 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1770467337.457268 6678696 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1770467339.901242 6678698 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+(.venv) nagashayanaramamurthy@MacBook-Pro update_model % clear
+(.venv) nagashayanaramamurthy@MacBook-Pro update_model % python cnn_model_trainer.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Found 79 images belonging to 2 classes.
+Found 19 images belonging to 2 classes.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/keras/src/trainers/data_adapters/py_dataset_adapter.py:121: UserWarning: Your `PyDataset` class should call `super().__init__(**kwargs)` in its constructor. `**kwargs` can include `workers`, `use_multiprocessing`, `max_queue_size`. Do not pass these arguments to `fit()`, as they will be ignored.
+  self._warn_if_super_not_called()
+Epoch 1/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 6s 1s/step - accuracy: 0.5170 - loss: 0.9688 - val_accuracy: 0.6316 - val_loss: 0.6490
+Epoch 2/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 950ms/step - accuracy: 0.4945 - loss: 1.0813 - val_accuracy: 0.7368 - val_loss: 0.6289
+Epoch 3/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 729ms/step - accuracy: 0.4946 - loss: 1.0306 - val_accuracy: 0.6842 - val_loss: 0.6783
+Epoch 4/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 703ms/step - accuracy: 0.6547 - loss: 0.7880 - val_accuracy: 0.6842 - val_loss: 0.6483
+Epoch 5/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 681ms/step - accuracy: 0.6677 - loss: 0.7036 - val_accuracy: 0.5263 - val_loss: 0.6882
+Epoch 6/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 701ms/step - accuracy: 0.6022 - loss: 0.7211 - val_accuracy: 0.6842 - val_loss: 0.6313
+Epoch 7/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 687ms/step - accuracy: 0.5772 - loss: 0.7383 - val_accuracy: 0.5789 - val_loss: 0.7225
+Epoch 8/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 706ms/step - accuracy: 0.6284 - loss: 0.6931 - val_accuracy: 0.4737 - val_loss: 0.7608
+Epoch 9/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 705ms/step - accuracy: 0.6756 - loss: 0.6742 - val_accuracy: 0.5263 - val_loss: 0.6938
+Epoch 10/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 958ms/step - accuracy: 0.6950 - loss: 0.6121 - val_accuracy: 0.5789 - val_loss: 0.6438
+Epoch 11/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 698ms/step - accuracy: 0.6894 - loss: 0.6476 - val_accuracy: 0.6316 - val_loss: 0.6187
+Epoch 12/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 747ms/step - accuracy: 0.7213 - loss: 0.5440 - val_accuracy: 0.4211 - val_loss: 0.7526
+Epoch 13/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 952ms/step - accuracy: 0.7955 - loss: 0.4979 - val_accuracy: 0.4737 - val_loss: 0.7220
+Epoch 14/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 685ms/step - accuracy: 0.8308 - loss: 0.4449 - val_accuracy: 0.4737 - val_loss: 0.7141
+Epoch 15/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 2s 737ms/step - accuracy: 0.8176 - loss: 0.5610 - val_accuracy: 0.7368 - val_loss: 0.5347
+Epoch 1/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 16s 2s/step - accuracy: 0.6344 - loss: 0.6195 - val_accuracy: 0.6842 - val_loss: 0.6462
+Epoch 2/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 859ms/step - accuracy: 0.6362 - loss: 0.7408 - val_accuracy: 0.6316 - val_loss: 0.6997
+Epoch 3/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 970ms/step - accuracy: 0.6692 - loss: 0.6015 - val_accuracy: 0.5789 - val_loss: 0.6680
+Epoch 4/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 960ms/step - accuracy: 0.7329 - loss: 0.4969 - val_accuracy: 0.6316 - val_loss: 0.6832
+Epoch 5/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7519 - loss: 0.5539 - val_accuracy: 0.5263 - val_loss: 0.6318
+Epoch 6/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.7243 - loss: 0.5510 - val_accuracy: 0.5263 - val_loss: 0.6827
+Epoch 7/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 869ms/step - accuracy: 0.7304 - loss: 0.5187 - val_accuracy: 0.5789 - val_loss: 0.6288
+Epoch 8/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 954ms/step - accuracy: 0.7869 - loss: 0.5237 - val_accuracy: 0.6316 - val_loss: 0.6015
+Epoch 9/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7222 - loss: 0.5320 - val_accuracy: 0.5263 - val_loss: 0.6637
+Epoch 10/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 973ms/step - accuracy: 0.6323 - loss: 0.6421 - val_accuracy: 0.5789 - val_loss: 0.6620
+Epoch 11/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7835 - loss: 0.4982 - val_accuracy: 0.5263 - val_loss: 0.6977
+Epoch 12/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.6880 - loss: 0.6139 - val_accuracy: 0.4737 - val_loss: 0.8772
+Epoch 13/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 4s 1s/step - accuracy: 0.6785 - loss: 0.6522 - val_accuracy: 0.5789 - val_loss: 0.6734
+Epoch 14/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.6760 - loss: 0.5593 - val_accuracy: 0.5263 - val_loss: 0.6233
+Epoch 15/15
+3/3 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.7202 - loss: 0.5210 - val_accuracy: 0.4737 - val_loss: 0.7035
+Model training complete!
+1/1 ━━━━━━━━━━━━━━━━━━━━ 1s 1s/step
+Precision: 0.5000
+Recall: 0.5000
+F1-Score: 0.5000
+Specificity: 0.4444
+
+plot10.png
