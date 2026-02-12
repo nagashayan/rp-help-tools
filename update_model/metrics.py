@@ -1,35 +1,49 @@
+import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
-import tensorflow as tf
+from sklearn.metrics import confusion_matrix
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# Ensure your validation_data generator is defined and NOT shuffled for evaluation
-validation_data.shuffle = False
-validation_data.reset()
+# 1. Load the model
+# Make sure the file name matches exactly what you saved (e.g., 'handshake_model.keras')
+model = tf.keras.models.load_model('handshake_model.keras')
 
-# 1. Predict
-Y_pred = model.predict(validation_data)
-y_pred = (Y_pred > 0.5).astype(int)
+# 2. Setup the data generator
+# FIX: Added 'validation_split=0.2' so it knows to grab the 20% validation set
+datagen = ImageDataGenerator(
+    preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
+    validation_split=0.2  # <--- THIS WAS MISSING
+)
 
-# 2. Calculate Precision, Recall, and F1
-precision, recall, f1, _ = precision_recall_fscore_support(validation_data.classes, y_pred, average='binary')
-tn, fp, fn, tp = confusion_matrix(validation_data.classes, y_pred).ravel()
-specificity = tn / (tn + fp)
+# 3. Load the validation data
+validation_data = datagen.flow_from_directory(
+    '../images/train_dataset_v2/', # Ensure this path is correct relative to where you run this script
+    target_size=(224, 224),
+    batch_size=32,
+    class_mode='binary',
+    subset='validation',
+    shuffle=False # Crucial for confusion matrix!
+)
 
-print(f"--- Technical Metrics for Paper ---")
-print(f"Precision: {precision:.4f}")
-print(f"Recall:    {recall:.4f}")
-print(f"F1-Score:  {f1:.4f}")
-print(f"Specificity: {specificity:.4f}")
+# 4. Predict
+print("Generating predictions...")
+if validation_data.samples > 0:
+    Y_pred = model.predict(validation_data)
+    y_pred = (Y_pred > 0.5).astype(int)
+    y_true = validation_data.classes
 
-# 3. Save Confusion Matrix
-cm = confusion_matrix(validation_data.classes, y_pred)
-plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Greens', 
-            xticklabels=['None', 'Handshake'], 
-            yticklabels=['None', 'Handshake'])
-plt.ylabel('Ground Truth')
-plt.xlabel('System Prediction')
-plt.title('Confusion Matrix: Real-time Handshake Verification')
-plt.savefig('confusion_matrix_final.png')
+    # 5. Draw the Matrix
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+                xticklabels=['Background', 'Handshake'],
+                yticklabels=['Background', 'Handshake'])
+    plt.xlabel('Predicted Label', fontsize=12)
+    plt.ylabel('True Label', fontsize=12)
+    plt.title('Confusion Matrix', fontsize=14)
+    plt.tight_layout()
+    plt.savefig('confusion_matrix.png')
+    print("Success! Saved confusion_matrix.png")
+else:
+    print("Error: Still found 0 images. Check your path '../images/train_dataset_v2/'")

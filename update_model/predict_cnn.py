@@ -34,6 +34,18 @@ detector = vision.HandLandmarker.create_from_options(options)
 
 model = tf.keras.models.load_model("handshake_model.keras")
 
+# --- CRITICAL: Force Window Size for Mobile Simulation ---
+window_name = "Handshake Z-Vector Logic"
+
+# 1. Create the window with the 'GUI_NORMAL' flag (often fixes resize issues on Mac)
+cv2.namedWindow(window_name, cv2.WINDOW_GUI_NORMAL) 
+
+# 2. Force the resize immediately
+cv2.resizeWindow(window_name, 450, 850) 
+
+# 3. (Optional) Move it to top-left so it doesn't get hidden
+cv2.moveWindow(window_name, 100, 100)
+
 # Configuration (UNTOUCHED)
 WINDOW_SIZE = 10 
 THRESHOLD = 0.60 
@@ -154,42 +166,77 @@ while cap.isOpened():
 
     # Get RAM Usage
     ram_usage = get_memory_usage()
+# ... (Keep your neural/logic code above) ...
+    ram_usage = get_memory_usage()
 
-# --- Dashboard Overlay (Expanded for Bigger Font) ---
-    # Increased height to 400 to fit the large text
-    cv2.rectangle(frame, (5, 5), (600, 360), (0, 0, 0), -1) 
+    # --- BEAUTIFIER DISPLAY LOGIC ---
     
-    # Increased spacing to 40 pixels between lines
-    cv2.putText(frame, f"CNN: {cnn_raw:.2f}", (15, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-    cv2.putText(frame, f"Pose (Z-Reach): {k_score:.2f}", (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-    cv2.putText(frame, f"Still: {p_score:.2f}", (15, 120), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
+    # 1. Smart Crop (Fixes the "Squashed Face" look)
+    # We resize height to 850, then crop the center 450 width
+    target_h = 850
+    target_w = 450
+    scale = target_h / h
+    new_w = int(w * scale)
+    resized_frame = cv2.resize(frame, (new_w, target_h))
     
-    v_color = (0, 255, 0) if is_pointing_at_camera else (0, 0, 255)
-    cv2.putText(frame, vector_label, (15, 160), cv2.FONT_HERSHEY_SIMPLEX, 1.0, v_color, 2)
+    center_x = new_w // 2
+    start_x = max(0, center_x - (target_w // 2))
+    display_frame = resized_frame[:, start_x:start_x+target_w]
 
-    # --- NEW PERFORMANCE METRICS ON SCREEN ---
-    cv2.line(frame, (15, 180), (580, 180), (100, 100, 100), 2) # Separator line
-    
-    cv2.putText(frame, f"Neural Latency: {neural_ms:.1f} ms", (15, 220), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
-    cv2.putText(frame, f"SBF Logic: {sbf_ms:.2f} ms", (15, 260), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
-    cv2.putText(frame, f"CNN Latency: {cnn_ms:.1f} ms", (15, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
-    cv2.putText(frame, f"Memory: {ram_usage:.1f} MB", (15, 340), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (200, 200, 200), 2)
+    # Double check we hit exact size (handle edge cases)
+    display_frame = cv2.resize(display_frame, (target_w, target_h))
 
+    # 2. "Glass" Overlay (Semi-Transparent Background)
+    overlay = display_frame.copy()
+    # Draw a dark box from top to y=320
+    cv2.rectangle(overlay, (0, 0), (450, 320), (20, 20, 20), -1) 
+    
+    # Apply the transparency (0.7 = 70% visible video, 30% dark tint)
+    alpha = 0.6
+    cv2.addWeighted(overlay, alpha, display_frame, 1 - alpha, 0, display_frame)
+
+    # 3. High-Quality Text (Anti-Aliased)
+    # Using FONT_HERSHEY_DUPLEX for a cleaner look
+    # lineType=cv2.LINE_AA is the secret to smooth text
+    text_color = (240, 240, 240)
+    label_color = (180, 180, 180) # Grey for labels
+    
+    # Row 1
+    cv2.putText(display_frame, "CNN Confidence:", (20, 40), cv2.FONT_HERSHEY_DUPLEX, 0.6, label_color, 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"{cnn_raw:.2f}", (240, 40), cv2.FONT_HERSHEY_DUPLEX, 0.6, text_color, 1, cv2.LINE_AA)
+
+    # Row 2
+    cv2.putText(display_frame, "Pose Score:", (20, 75), cv2.FONT_HERSHEY_DUPLEX, 0.6, label_color, 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"{k_score:.2f}", (240, 75), cv2.FONT_HERSHEY_DUPLEX, 0.6, text_color, 1, cv2.LINE_AA)
+
+    # Row 3
+    cv2.putText(display_frame, "Stability:", (20, 110), cv2.FONT_HERSHEY_DUPLEX, 0.6, label_color, 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"{p_score:.2f}", (240, 110), cv2.FONT_HERSHEY_DUPLEX, 0.6, text_color, 1, cv2.LINE_AA)
+
+    # Row 4 (The Status)
+    v_color = (50, 255, 50) if is_pointing_at_camera else (50, 50, 255)
+    cv2.putText(display_frame, vector_label, (20, 150), cv2.FONT_HERSHEY_DUPLEX, 0.7, v_color, 1, cv2.LINE_AA)
+
+    # Separator
+    cv2.line(display_frame, (20, 170), (430, 170), (100, 100, 100), 1)
+
+    # Performance Stats (Smaller font)
+    cv2.putText(display_frame, f"Neural Latency: {neural_ms:.1f} ms", (20, 200), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"SBF Logic:      {sbf_ms:.2f} ms", (20, 225), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"CNN Latency:    {cnn_ms:.1f} ms", (20, 250), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(display_frame, f"Memory Usage:   {ram_usage:.1f} MB", (20, 275), cv2.FONT_HERSHEY_DUPLEX, 0.5, (180, 180, 180), 1, cv2.LINE_AA)
+
+    # Final Status Label at Bottom
     if avg_conf > THRESHOLD and p_score > 0.6:
-        label, color = "VERIFIED: WAITING", (0, 255, 0)
-    elif avg_conf > THRESHOLD:
-        label, color = "Stabilizing...", (0, 255, 255)
+        label, color = "VERIFIED", (50, 255, 50)
     else:
-        label, color = "Scanning...", (0, 0, 255)
+        label, color = "SCANNING...", (50, 50, 255)
 
-    cv2.putText(frame, label, (10, h - 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, color, 3)
-    cv2.imshow("Handshake Z-Vector Logic", frame)
-    
-    # Console Print for Excel Data
-    # Only print every 10th frame to avoid flooding
-    if int(timestamp) % 10 == 0:
-        print(f"{neural_ms:<12.2f} | {sbf_ms:<12.4f} | {cnn_ms:<12.2f} | {ram_usage:<12.2f}")
+    # Add a bottom bar for the status
+    cv2.rectangle(display_frame, (0, 780), (450, 850), (0,0,0), -1)
+    cv2.putText(display_frame, label, (110, 825), cv2.FONT_HERSHEY_DUPLEX, 1.0, color, 2, cv2.LINE_AA)
 
+    cv2.imshow(window_name, display_frame)
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 
 cap.release()
