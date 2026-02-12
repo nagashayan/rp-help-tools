@@ -73,3 +73,12 @@ Social Sensing (The "Face/Voice" Way): "Bano (2017) and others focused on faces/
 Modern AI (The "Too Heavy" Way): "EgoBlind (2025) shows that massive AI models still struggle with intent."
 
 Your Solution: "We solve all of this with the Social Biomechanics Filter."
+
+
+Next:
+
+Phase 1 (Now): Submit the Full Paper to HCICC (Feb 28). This is your "Technical Anchor." It's Springer-published and Scopus-indexed.
+
+Phase 2 (Next Month): Submit the Poster Abstract to HCII (March 30). This is your "Prestige Anchor" at a top global venue.
+
+Phase 3 (Summer 2026): Once you have gathered more user feedback from the conferences, rewrite the work into a 12-page Full Journal Paper for an Open Access journal like IEEE Access or Scientific Reports.

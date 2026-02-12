@@ -3,3 +3,4 @@ mediapipe-model-maker
 tensorflow
 tensorflow-metal # for graphic acceleration on Mac
 mediapipe
+psutil
