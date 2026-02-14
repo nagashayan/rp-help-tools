@@ -365,3 +365,37 @@ F1-Score: 0.5000
 Specificity: 0.4444
 
 plot10.png
+
+Created sequence based dataset to generate confusion matrix and other metrics
+
+python sequence_based_confusion_matrix.py
+
+CNN Sequence Confusion Matrix (rolling window)
+[[12  1]
+ [12  3]]
+
+Hybrid Sequence Confusion Matrix (rolling window + stability gate)
+[[13  0]
+ [ 9  6]]
+
+CNN Classification Report (sequence-level)
+              precision    recall  f1-score   support
+
+           0       0.50      0.92      0.65        13
+           1       0.75      0.20      0.32        15
+
+    accuracy                           0.54        28
+   macro avg       0.62      0.56      0.48        28
+weighted avg       0.63      0.54      0.47        28
+
+
+Hybrid Classification Report (sequence-level)
+              precision    recall  f1-score   support
+
+           0       0.59      1.00      0.74        13
+           1       1.00      0.40      0.57        15
+
+    accuracy                           0.68        28
+   macro avg       0.80      0.70      0.66        28
+weighted avg       0.81      0.68      0.65        28
+
