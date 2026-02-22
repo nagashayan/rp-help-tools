@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
+import math
 import mediapipe as mp
 import time
 import psutil
@@ -47,8 +48,8 @@ cv2.resizeWindow(window_name, 450, 850)
 cv2.moveWindow(window_name, 100, 100)
 
 # Configuration (UNTOUCHED)
-WINDOW_SIZE = 10 
-THRESHOLD = 0.60 
+WINDOW_SIZE = 10
+THRESHOLD = 0.60
 prediction_queue = deque(maxlen=WINDOW_SIZE)
 
 STABILITY_HISTORY = 10
@@ -112,9 +113,9 @@ while cap.isOpened():
         
         # Threshold Logic:
         # reach_val < 0.05: Hand is flat (High Five, Salute, Stop Sign)
-        # reach_val > 0.10: Hand is reaching out (Handshake, Pointing)
+        # reach_val > 0.08: Hand is reaching out (Handshake, Pointing)
         is_pointing_at_camera = reach_val > 0.08 # Adjusted threshold for "Reach"
-        
+
         if is_pointing_at_camera:
             vector_label = f"Reaching Forward (Z={reach_val:.2f})"
         else:

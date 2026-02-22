@@ -164,6 +164,7 @@ cython_debug/
 # ml models
 images/
 update_model/v*/
+p2/dataset_landmarks/
 
 # vscode
 .vscode/
