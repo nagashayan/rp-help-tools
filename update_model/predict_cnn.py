@@ -65,6 +65,27 @@ def get_pointing_vector(landmarks):
     reach_z = wrist.z - finger_tip.z 
     return reach_z
 
+def get_palm_tilt(landmarks):
+    """
+    Calculates the vertical tilt of the palm.
+    Returns the angle in degrees (0 to 180).
+    A perfect handshake is around 90 degrees.
+
+    This is to avoid palm facing up/down (0 or 180) which can cause false positives in certain poses. We want to ensure the hand is vertical enough to be a handshake, not a gesture of asking money or just pointing hand towards the user.
+    """
+    index_base = landmarks[5]
+    pinky_base = landmarks[17]
+    
+    # Calculate difference in X and Y
+    dx = index_base.x - pinky_base.x
+    dy = index_base.y - pinky_base.y
+    
+    # Calculate the angle using arctangent
+    angle = math.degrees(math.atan2(dy, dx))
+    
+    # We only care about the absolute vertical tilt, so we normalize to 0-180
+    return abs(angle)
+
 cap = cv2.VideoCapture(0)
 
 # Print Header for Data Collection
@@ -121,6 +142,10 @@ while cap.isOpened():
         else:
             vector_label = f"Flat/Vertical (Z={reach_val:.2f})"
 
+        # 3. Tilt Check (Palm is vertical, not flat)
+        palm_tilt = get_palm_tilt(landmarks)
+        is_vertical = 60 < palm_tilt < 120  # True if hand is sideways/vertical
+
         # --- KINEMATIC SCORE ---
         # 1. Base Openness Check (V-Angle)
         thumb_tip = np.array([current_landmarks[4].x, current_landmarks[4].y])
@@ -133,6 +158,8 @@ while cap.isOpened():
             k_score = 0.0 # Reject if not pointing at person
         elif not is_open:
             k_score = 0.0 # Reject if thumb is tucked (Fist pointing)
+        elif not is_vertical:
+            k_score = 0 # Penalize if palm is not vertical (could be a "Money" gesture or just pointing)
         else:
             k_score = 1.0 # Perfect handshake candidate
 
