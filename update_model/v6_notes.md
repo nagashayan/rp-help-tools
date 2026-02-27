@@ -600,3 +600,31 @@ True Positives (Hit)     : 13
 False Positives (Miss)   : 0
 True Negatives (Correct) : 13
 False Negatives (Miss)   : 2
+
+
+thats gold
+
+We gated CNN, we run CNN only when hand is detected and reach & pose is validated.
+We also used landmark lite mode which earlier increased FPS to 5.6.
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 1193
+MediaPipe Tracking (ms)  : 133.87 ms
+Spatial SBF Logic (ms)   : 0.39 ms
+MobileNetV2 CNN (ms)     : 11.41 ms
+--------------------------------------------------
+Total Pipeline Latency   : 145.67 ms
+Estimated Real-Time FPS  : 6.9 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 13
+False Positives (Miss)   : 0
+True Negatives (Correct) : 13
+False Negatives (Miss)   : 2
+
+Highest and best so far.
+stopping here for now.
