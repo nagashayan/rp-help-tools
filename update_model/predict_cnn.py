@@ -14,7 +14,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # ==========================================
 # Configurations & Settings
 # ==========================================
-WINDOW_NAME = "Neuro Symbolic AI - Handshake Detection"
+WINDOW_NAME = "Handshake Z-Vector Logic"
 WINDOW_WIDTH = 450
 WINDOW_HEIGHT = 850
 
@@ -165,18 +165,26 @@ while cap.isOpened():
     # ------------------------------------------
     t_start = time.perf_counter()
     
-    img_cnn = cv2.resize(frame_rgb, (224, 224))
+    # === NEW: BIAS MITIGATION LOGIC ===
+    # Convert live frame to Grayscale to destroy skin-tone/lighting bias
+    gray_1c = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2GRAY)
+    # Duplicate to 3-channels so MobileNetV2 accepts the tensor shape
+    gray_3c = cv2.cvtColor(gray_1c, cv2.COLOR_GRAY2RGB)
+    
+    img_cnn = cv2.resize(gray_3c, (224, 224))
     img_cnn = cv2.GaussianBlur(img_cnn, (5, 5), 0)
     img_cnn = preprocess_input(img_cnn.astype(np.float32))
     img_cnn = np.expand_dims(img_cnn, axis=0)
+    
+    # Predict using the unbiased gray image
     cnn_raw = model.predict(img_cnn, verbose=0)[0][0]
+    # ==================================
     
     cnn_ms = (time.perf_counter() - t_start) * 1000
 
     # ------------------------------------------
     # 4. Fusion & Decision
     # ------------------------------------------
-    # Consistent Fusion Equation
     fused_pred = (0.5 * cnn_raw) + (0.3 * pose_score) + (0.2 * stability_score)
     prediction_queue.append(fused_pred)
     avg_conf = sum(prediction_queue) / len(prediction_queue)
@@ -194,7 +202,7 @@ while cap.isOpened():
     display_frame = resized_frame[:, start_x:start_x+WINDOW_WIDTH]
     display_frame = cv2.resize(display_frame, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    # Transparent Overlay Box - Shrinking height since we removed the middle text
+    # Transparent Overlay Box
     overlay = display_frame.copy()
     cv2.rectangle(overlay, (0, 0), (WINDOW_WIDTH, 300), (20, 20, 20), -1) 
     cv2.addWeighted(overlay, 0.6, display_frame, 0.4, 0, display_frame)
@@ -230,7 +238,7 @@ while cap.isOpened():
     # Separator
     cv2.line(display_frame, (20, 190), (430, 190), (100, 100, 100), 1)
 
-    # --- UI Section: Diagnostics (Shifted Up) ---
+    # --- UI Section: Diagnostics ---
     cv2.putText(display_frame, f"Neural Latency: {neural_ms:.1f} ms", (20, 220), font, 0.4, (0, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(display_frame, f"SBF Logic:      {sbf_ms:.2f} ms", (20, 240), font, 0.4, (0, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(display_frame, f"CNN Latency:    {cnn_ms:.1f} ms", (20, 260), font, 0.4, (0, 255, 255), 1, cv2.LINE_AA)
@@ -239,10 +247,10 @@ while cap.isOpened():
     # --- Final Output Bar ---
     if avg_conf > THRESHOLD and stability_score > 0.6:
         label, color = "HANDSHAKE", (50, 255, 50)
-        text_x = 100 # Centered for shorter word
+        text_x = 100
     else:
         label, color = "NO HANDSHAKE", (50, 50, 255)
-        text_x = 60  # Shifted left for longer word
+        text_x = 60
 
     cv2.rectangle(display_frame, (0, WINDOW_HEIGHT-70), (WINDOW_WIDTH, WINDOW_HEIGHT), (0,0,0), -1)
     
