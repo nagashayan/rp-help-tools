@@ -36,7 +36,7 @@ data_dir = '../images/train_dataset_v2/unbiased/'
 
 train_data = datagen.flow_from_directory(
     data_dir,
-    target_size=(224, 224),
+    target_size=(160, 160),
     batch_size=32,
     class_mode='binary',
     subset='training',
@@ -45,7 +45,7 @@ train_data = datagen.flow_from_directory(
 
 validation_data = datagen.flow_from_directory(
     data_dir,
-    target_size=(224, 224),
+    target_size=(160, 160),
     batch_size=32,
     class_mode='binary',
     subset='validation',
@@ -64,7 +64,7 @@ class_weight_dict = {i: class_weights[i] for i in range(len(class_weights))}
 # 2. Model Architecture
 # ==========================================
 base_model = tf.keras.applications.MobileNetV2(
-    input_shape=(224, 224, 3),
+    input_shape=(160, 160, 3),
     include_top=False,
     weights='imagenet'
 )
@@ -170,7 +170,7 @@ eval_datagen = ImageDataGenerator(preprocessing_function=combined_preprocessing)
 
 evaluation_data = eval_datagen.flow_from_directory(
     data_dir,
-    target_size=(224, 224),
+    target_size=(160, 160),
     batch_size=32,
     class_mode='binary',
     subset='training', # Testing on validation split requires manual folder separation, but to ensure labels match, we evaluate on a strict non-shuffled generator.

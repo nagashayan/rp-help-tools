@@ -487,3 +487,116 @@ along with previous tips
 	•	Use asynchronous threading
 
 Then re-benchmark.
+
+reduce img size to 160 from 224
+
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 8s 340ms/step - accuracy: 0.4333 - loss: 0.9544 - val_accuracy: 0.5440 - val_loss: 0.6654
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 275ms/step - accuracy: 0.5840 - loss: 0.7445 - val_accuracy: 0.5840 - val_loss: 0.6838
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 274ms/step - accuracy: 0.6891 - loss: 0.5978 - val_accuracy: 0.5280 - val_loss: 0.7203
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 5s 281ms/step - accuracy: 0.6938 - loss: 0.6034 - val_accuracy: 0.5280 - val_loss: 0.7725
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 268ms/step - accuracy: 0.7850 - loss: 0.5097 - val_accuracy: 0.6000 - val_loss: 0.7180
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 267ms/step - accuracy: 0.7710 - loss: 0.4730 - val_accuracy: 0.5280 - val_loss: 0.7319
+
+--- Starting Phase 2: Fine-Tuning ---
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 9s 340ms/step - accuracy: 0.5412 - loss: 0.7165 - val_accuracy: 0.6160 - val_loss: 0.6826
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 271ms/step - accuracy: 0.5824 - loss: 0.7064 - val_accuracy: 0.5920 - val_loss: 0.6617
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 5s 283ms/step - accuracy: 0.6714 - loss: 0.6526 - val_accuracy: 0.5520 - val_loss: 0.7111
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 277ms/step - accuracy: 0.6950 - loss: 0.5831 - val_accuracy: 0.5840 - val_loss: 0.7065
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 274ms/step - accuracy: 0.6808 - loss: 0.5880 - val_accuracy: 0.5920 - val_loss: 0.7107
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 272ms/step - accuracy: 0.6309 - loss: 0.6130 - val_accuracy: 0.5760 - val_loss: 0.7217
+Epoch 7/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 275ms/step - accuracy: 0.6768 - loss: 0.6080 - val_accuracy: 0.5680 - val_loss: 0.7152
+Epoch 8/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 274ms/step - accuracy: 0.7301 - loss: 0.5245 - val_accuracy: 0.5520 - val_loss: 0.7455
+Epoch 9/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 276ms/step - accuracy: 0.7672 - loss: 0.4961 - val_accuracy: 0.5840 - val_loss: 0.7509
+Epoch 10/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 277ms/step - accuracy: 0.7349 - loss: 0.5375 - val_accuracy: 0.6080 - val_loss: 0.7327
+Epoch 11/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 272ms/step - accuracy: 0.7451 - loss: 0.5067 - val_accuracy: 0.5760 - val_loss: 0.7538
+Epoch 12/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 270ms/step - accuracy: 0.7789 - loss: 0.4760 - val_accuracy: 0.5440 - val_loss: 0.7629
+Epoch 13/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 271ms/step - accuracy: 0.7559 - loss: 0.5114 - val_accuracy: 0.5600 - val_loss: 0.7502
+Epoch 14/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 272ms/step - accuracy: 0.7932 - loss: 0.4682 - val_accuracy: 0.5840 - val_loss: 0.7739
+Epoch 15/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 275ms/step - accuracy: 0.7973 - loss: 0.4631 - val_accuracy: 0.5920 - val_loss: 0.7759
+Model training complete and saved as handshake_model.keras!
+Saved learning_curves.png
+
+--- Running Final Evaluation ---
+Found 626 images belonging to 2 classes.
+20/20 ━━━━━━━━━━━━━━━━━━━━ 4s 153ms/step 
+Precision:   0.8179
+Recall:      0.7156
+F1-Score:    0.7633
+Specificity: 0.8333
+Saved confusion_matrix.png
+
+
+After reducing input to 160*160 size
+
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON RASPBERRY PI...
+==================================================
+Processing handshake/clip_10 (43 frames)...
+W0000 00:00:1772211111.264186    3138 landmark_projection_calculator.cc:186] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+Processing handshake/clip_11 (48 frames)...
+Processing handshake/clip_12 (43 frames)...
+Processing handshake/clip_13 (59 frames)...
+Processing handshake/clip_14 (49 frames)...
+Processing handshake/clip_15 (39 frames)...
+Processing handshake/clip_16 (46 frames)...
+Processing handshake/clip_17 (53 frames)...
+Processing handshake/clip_3 (43 frames)...
+Processing handshake/clip_4 (42 frames)...
+Processing handshake/clip_5 (44 frames)...
+Processing handshake/clip_6 (47 frames)...
+Processing handshake/clip_7 (40 frames)...
+Processing handshake/clip_8 (44 frames)...
+Processing handshake/clip_9 (35 frames)...
+Processing none/clip_18 (35 frames)...
+Processing none/clip_19 (38 frames)...
+Processing none/clip_20 (41 frames)...
+Processing none/clip_21 (41 frames)...
+Processing none/clip_22 (40 frames)...
+Processing none/clip_23 (40 frames)...
+Processing none/clip_24 (42 frames)...
+Processing none/clip_25 (38 frames)...
+Processing none/clip_26 (42 frames)...
+Processing none/clip_27 (40 frames)...
+Processing none/clip_28 (36 frames)...
+Processing none/clip_29 (37 frames)...
+Processing none/clip_30 (53 frames)...
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 1193
+MediaPipe Tracking (ms)  : 133.70 ms
+Spatial SBF Logic (ms)   : 0.39 ms
+MobileNetV2 CNN (ms)     : 46.60 ms
+--------------------------------------------------
+Total Pipeline Latency   : 180.69 ms
+Estimated Real-Time FPS  : 5.5 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 13
+False Positives (Miss)   : 0
+True Negatives (Correct) : 13
+False Negatives (Miss)   : 2
