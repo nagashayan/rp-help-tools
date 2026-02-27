@@ -6,8 +6,8 @@ import glob
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 # 2. Define your folders
-input_folder = "../images/train_dataset_v2/handshake/"
-output_folder = "../images/train_dataset_v2/unbiased/handshake/"
+input_folder = "../images/train_dataset_v2/none/"
+output_folder = "../images/train_dataset_v2/unbiased/none/"
 
 os.makedirs(output_folder, exist_ok=True)
 

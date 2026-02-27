@@ -256,3 +256,71 @@ F1-Score:    0.7789
 Specificity: 0.7372
 
 We need my friend (Shyla) images, I plan to take ~180 images today (90 handshake, 90 none), which hopefully will improve validation accuracy.
+
+Added 200 images
+
+
+python cnn_model_trainer.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Found 501 images belonging to 2 classes.
+Found 125 images belonging to 2 classes.
+
+--- Starting Phase 1: Feature Extraction ---
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/keras/src/trainers/data_adapters/py_dataset_adapter.py:121: UserWarning: Your `PyDataset` class should call `super().__init__(**kwargs)` in its constructor. `**kwargs` can include `workers`, `use_multiprocessing`, `max_queue_size`. Do not pass these arguments to `fit()`, as they will be ignored.
+  self._warn_if_super_not_called()
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 10s 459ms/step - accuracy: 0.5583 - loss: 0.7440 - val_accuracy: 0.5600 - val_loss: 0.7067
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 377ms/step - accuracy: 0.6967 - loss: 0.6429 - val_accuracy: 0.6240 - val_loss: 0.7275
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 378ms/step - accuracy: 0.6985 - loss: 0.5397 - val_accuracy: 0.6000 - val_loss: 0.7178
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 372ms/step - accuracy: 0.7487 - loss: 0.5260 - val_accuracy: 0.6000 - val_loss: 0.7293
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 375ms/step - accuracy: 0.7782 - loss: 0.4786 - val_accuracy: 0.5520 - val_loss: 0.8044
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 374ms/step - accuracy: 0.7965 - loss: 0.4346 - val_accuracy: 0.5360 - val_loss: 0.8380
+
+--- Starting Phase 2: Fine-Tuning ---
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 11s 467ms/step - accuracy: 0.6252 - loss: 0.6526 - val_accuracy: 0.6320 - val_loss: 0.6669
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 384ms/step - accuracy: 0.6865 - loss: 0.5948 - val_accuracy: 0.6160 - val_loss: 0.6753
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 385ms/step - accuracy: 0.6606 - loss: 0.6155 - val_accuracy: 0.5840 - val_loss: 0.7134
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 381ms/step - accuracy: 0.7008 - loss: 0.5680 - val_accuracy: 0.5840 - val_loss: 0.7161
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 382ms/step - accuracy: 0.6942 - loss: 0.5859 - val_accuracy: 0.5920 - val_loss: 0.6841
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 382ms/step - accuracy: 0.7109 - loss: 0.5732 - val_accuracy: 0.5840 - val_loss: 0.7335
+Epoch 7/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 383ms/step - accuracy: 0.7403 - loss: 0.5163 - val_accuracy: 0.6320 - val_loss: 0.7072
+Epoch 8/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 384ms/step - accuracy: 0.7724 - loss: 0.5029 - val_accuracy: 0.6320 - val_loss: 0.7234
+Epoch 9/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 381ms/step - accuracy: 0.7385 - loss: 0.5131 - val_accuracy: 0.6080 - val_loss: 0.7637
+Epoch 10/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 385ms/step - accuracy: 0.7780 - loss: 0.4461 - val_accuracy: 0.5840 - val_loss: 0.7856
+Epoch 11/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 380ms/step - accuracy: 0.7881 - loss: 0.4613 - val_accuracy: 0.6080 - val_loss: 0.7486
+Epoch 12/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 385ms/step - accuracy: 0.7983 - loss: 0.4351 - val_accuracy: 0.6000 - val_loss: 0.7397
+Epoch 13/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 384ms/step - accuracy: 0.8028 - loss: 0.4254 - val_accuracy: 0.5760 - val_loss: 0.7752
+Epoch 14/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 378ms/step - accuracy: 0.7994 - loss: 0.4485 - val_accuracy: 0.5600 - val_loss: 0.7869
+Epoch 15/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 6s 387ms/step - accuracy: 0.8203 - loss: 0.4220 - val_accuracy: 0.6240 - val_loss: 0.7796
+Model training complete and saved as handshake_model.keras!
+Saved learning_curves.png
+
+--- Running Final Evaluation ---
+Found 626 images belonging to 2 classes.
+20/20 ━━━━━━━━━━━━━━━━━━━━ 4s 169ms/step 
+Precision:   0.8509
+Recall:      0.7312
+F1-Score:    0.7866
+Specificity: 0.8660
+Saved confusion_matrix.png
