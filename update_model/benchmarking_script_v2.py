@@ -11,12 +11,16 @@ from mediapipe.tasks.python import vision
 from collections import deque
 
 # --- EDGE OPTIMIZATION: Import only the lightweight TFLite runtime ---
-from ai_edge_litert.interpreter import Interpreter
+
+# from ai_edge_litert.interpreter import Interpreter
+
+# --- MAC OPTIMIZATION: Using standard TensorFlow Lite ---
+from tensorflow.lite.python.interpreter import Interpreter
 
 # ==========================================
 # Configurations & Settings
 # ==========================================
-WINDOW_NAME = "Handshake Z-Vector Logic (EDGE TFLITE)"
+WINDOW_NAME = "Handshake Z-Vector Logic (MAC BENCHMARK)"
 WINDOW_WIDTH = 450
 WINDOW_HEIGHT = 850
 
@@ -47,17 +51,17 @@ HAND_CONNECTIONS = frozenset([
 # Initialization
 # ==========================================
 def init_mediapipe():
-    base_options = python.BaseOptions(model_asset_path='hand_landmarker_lite.task')
+    base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
     options = vision.HandLandmarkerOptions(
         base_options=base_options,
-        num_hands=1,
+        num_hands=3, # <--- UPDATED: Tracking up to 3 hands for egocentric complexity
         running_mode=vision.RunningMode.VIDEO 
     )
     return vision.HandLandmarker.create_from_options(options)
 
 detector = init_mediapipe()
 
-# --- EDGE OPTIMIZATION: Load the TFLite Model ---
+# --- Load the TFLite Model ---
 interpreter = Interpreter(model_path="handshake_model_optimized.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
@@ -103,7 +107,7 @@ def preprocess_input_edge(x):
 # ==========================================
 # Benchmark Setup
 # ==========================================
-BENCHMARK_DIR = "sequence_dataset"
+BENCHMARK_DIR = "../images/sequence_datasetv3"
 if not os.path.exists(BENCHMARK_DIR):
     print(f"ERROR: Please create the folder structure '{BENCHMARK_DIR}/handshake' and '{BENCHMARK_DIR}/none'.")
     exit()
@@ -122,7 +126,7 @@ true_negatives = 0
 false_negatives = 0
 
 print("==================================================")
-print("🚀 STARTING NESTED BATCH BENCHMARK ON RASPBERRY PI...")
+print("🚀 STARTING NESTED BATCH BENCHMARK ON MAC...")
 print("==================================================")
 
 # Find the category folders (e.g., 'handshake', 'none')
@@ -167,37 +171,49 @@ for category in categories:
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
             timestamp = int(cv2.getTickCount() / cv2.getTickFrequency() * 1000)
             
-            pose_score, stability_score, reach_val, palm_tilt = 0.0, 0.0, 0.0, 0.0
-            is_reaching, is_open, is_vertical = False, False, False
-            
             # --- PROBE 1: MediaPipe ---
             t_start = time.perf_counter()
             detection_result = detector.detect_for_video(mp_image, timestamp)
             neural_ms = (time.perf_counter() - t_start) * 1000
 
-            # --- PROBE 2: SBF Logic ---
+            # --- PROBE 2: SBF Logic (MULTI-HAND DYNAMIC GATE) ---
             t_start = time.perf_counter()
+            
+            target_landmarks = None
+            is_reaching = is_open = is_vertical = False
+            pose_score, stability_score = 0.0, 0.0
+            
             if detection_result.hand_landmarks:
-                landmarks = detection_result.hand_landmarks[0]
-                draw_skeleton(frame, landmarks, w, h)
-
-                reach_val = get_pointing_vector(landmarks)
-                is_reaching = reach_val > REACH_THRESHOLD
+                # Loop through all detected hands to find the one doing the gesture
+                for landmarks in detection_result.hand_landmarks:
+                    reach_val = get_pointing_vector(landmarks)
+                    temp_reaching = reach_val > REACH_THRESHOLD
+                    
+                    palm_tilt = get_palm_tilt(landmarks)
+                    temp_vertical = TILT_MIN < palm_tilt < TILT_MAX
+                    temp_open = check_thumb_open(landmarks)
+                    
+                    if temp_reaching and temp_open and temp_vertical:
+                        target_landmarks = landmarks
+                        is_reaching, is_open, is_vertical = True, True, True
+                        pose_score = 1.0
+                        break # Found the active hand! Stop searching.
                 
-                palm_tilt = get_palm_tilt(landmarks)
-                is_vertical = TILT_MIN < palm_tilt < TILT_MAX
-                is_open = check_thumb_open(landmarks)
-                
-                if is_reaching and is_open and is_vertical:
-                    pose_score = 1.0
+                # Fallback: If no hand is reaching, just track the largest/first one
+                if not target_landmarks:
+                    target_landmarks = detection_result.hand_landmarks[0]
+                    # Booleans stay False, so the CNN gate stays shut
 
-                wrist = landmarks[0]
+                draw_skeleton(frame, target_landmarks, w, h)
+                wrist = target_landmarks[0]
                 coord_history.append((wrist.x, wrist.y))
+                
                 if len(coord_history) == STABILITY_HISTORY:
                     avg_std = (np.std([c[0] for c in coord_history]) + np.std([c[1] for c in coord_history])) / 2
                     stability_score = np.clip(1.0 - (avg_std / MAX_STABILITY_STD), 0, 1)
             else:
                 coord_history.clear()
+                
             sbf_ms = (time.perf_counter() - t_start) * 1000
 
             # --- PROBE 3: TFLITE CNN Inference (SBF GATED) ---
@@ -217,7 +233,7 @@ for category in categories:
                 interpreter.invoke()
                 cnn_raw = interpreter.get_tensor(output_details[0]['index'])[0][0]
             else:
-                # Bypass the CNN entirely to save ~46ms per frame!
+                # Bypass the CNN entirely!
                 cnn_raw = 0.0
                 
             cnn_ms = (time.perf_counter() - t_start) * 1000

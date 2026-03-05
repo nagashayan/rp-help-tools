@@ -628,3 +628,9 @@ False Negatives (Miss)   : 2
 
 Highest and best so far.
 stopping here for now.
+
+"While the system achieved high sensitivity, failure case analysis revealed that extreme vertical offsets (e.g., handshakes initiated significantly above or below the camera's horizon line) induce severe 2D perspective distortion. This distortion temporarily invalidates the SBF's palm-tilt estimations. Future iterations could address this by leveraging the full 3D rotation matrix provided by MediaPipe, rather than relying on 2D planar projections."
+
+clip_11 (low handshake) and clip_12 (high handshake) in sequence_dataset_v3
+
+"The pipeline achieved an 85.7% True Positive rate with strict zero False Positives. Failure case analysis revealed two primary limitations: extreme perspective collapse during 'low' handshakes (clip_11, clip_12), and temporal misalignment where peak neural confidence and peak spatial stability failed to synchronize within the same frame during rapid gestures (clip_10)."

@@ -8,7 +8,7 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
 
 # Create folders
-BASE_DIR = "sequence_dataset"
+BASE_DIR = "../images/sequence_datasetv3"
 os.makedirs(f"{BASE_DIR}/handshake", exist_ok=True)
 os.makedirs(f"{BASE_DIR}/none", exist_ok=True)
 
