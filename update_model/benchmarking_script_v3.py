@@ -10,10 +10,6 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from collections import deque
 
-# --- EDGE OPTIMIZATION: Import only the lightweight TFLite runtime ---
-
-# from ai_edge_litert.interpreter import Interpreter
-
 # --- MAC OPTIMIZATION: Using standard TensorFlow Lite ---
 from tensorflow.lite.python.interpreter import Interpreter
 
@@ -26,7 +22,7 @@ WINDOW_HEIGHT = 850
 
 # Temporal Settings
 WINDOW_SIZE = 10
-THRESHOLD = 0.60
+THRESHOLD = 0.50
 prediction_queue = deque(maxlen=WINDOW_SIZE)
 
 STABILITY_HISTORY = 10
@@ -36,8 +32,8 @@ MAX_STABILITY_STD = 0.060
 # Logic Thresholds (The SBF Gates)
 REACH_THRESHOLD = 0.05
 THUMB_OPEN_THRESHOLD = 0.06
-TILT_MIN = 60
-TILT_MAX = 120
+TILT_MIN = 20   # Widened for extreme perspectives
+TILT_MAX = 160  # Widened for extreme perspectives
 
 HAND_CONNECTIONS = frozenset([
     (0, 1), (1, 2), (2, 3), (3, 4),      
@@ -54,7 +50,7 @@ def init_mediapipe():
     base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
     options = vision.HandLandmarkerOptions(
         base_options=base_options,
-        num_hands=1, # <--- Updating to 3 on pi is leading to instability, so keeping it at 1 for a more consistent benchmark
+        num_hands=3, 
         running_mode=vision.RunningMode.VIDEO 
     )
     return vision.HandLandmarker.create_from_options(options)
@@ -126,10 +122,9 @@ true_negatives = 0
 false_negatives = 0
 
 print("==================================================")
-print("🚀 STARTING NESTED BATCH BENCHMARK ON MAC...")
+print("🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...")
 print("==================================================")
 
-# Find the category folders (e.g., 'handshake', 'none')
 categories = sorted([d for d in os.listdir(BENCHMARK_DIR) if os.path.isdir(os.path.join(BENCHMARK_DIR, d))])
 
 # ==========================================
@@ -137,8 +132,6 @@ categories = sorted([d for d in os.listdir(BENCHMARK_DIR) if os.path.isdir(os.pa
 # ==========================================
 for category in categories:
     category_path = os.path.join(BENCHMARK_DIR, category)
-    
-    # 1. Determine ground truth from the parent category folder name
     is_actual_handshake = "handshake" in category.lower()
     
     clip_folders = sorted([d for d in os.listdir(category_path) if os.path.isdir(os.path.join(category_path, d))])
@@ -148,15 +141,24 @@ for category in categories:
         image_paths = sorted(glob.glob(f"{clip_path}/*.jpg"))
         
         if not image_paths:
-            print(f"Skipping {category}/{clip_name} (No .jpg files found)")
             continue
 
         system_triggered_handshake = False
 
-        # 2. Reset the temporal queues for the new sequence!
+        # Reset the temporal queues and latches for the new sequence
         coord_history.clear()
         prediction_queue.clear()
+        sbf_latch_counter = 0 # NEW: Reset the latch for each clip
         
+        # --- NEW: Clip-Level Diagnostics Trackers ---
+        clip_max_reach = 0.0
+        clip_min_tilt, clip_max_tilt = 999.0, 0.0
+        clip_thumb_open = False
+        clip_max_stability = 0.0
+        clip_max_cnn = 0.0
+        clip_max_avg_conf = 0.0
+        clip_sbf_passed = False
+
         print(f"Processing {category}/{clip_name} ({len(image_paths)} frames)...")
 
         for img_path in image_paths:
@@ -184,7 +186,6 @@ for category in categories:
             pose_score, stability_score = 0.0, 0.0
             
             if detection_result.hand_landmarks:
-                # Loop through all detected hands to find the one doing the gesture
                 for landmarks in detection_result.hand_landmarks:
                     reach_val = get_pointing_vector(landmarks)
                     temp_reaching = reach_val > REACH_THRESHOLD
@@ -193,16 +194,28 @@ for category in categories:
                     temp_vertical = TILT_MIN < palm_tilt < TILT_MAX
                     temp_open = check_thumb_open(landmarks)
                     
+                    # Log highest values seen in the frame for the autopsy
+                    clip_max_reach = max(clip_max_reach, reach_val)
+                    clip_min_tilt = min(clip_min_tilt, palm_tilt)
+                    clip_max_tilt = max(clip_max_tilt, palm_tilt)
+                    if temp_open: clip_thumb_open = True
+                    
                     if temp_reaching and temp_open and temp_vertical:
                         target_landmarks = landmarks
                         is_reaching, is_open, is_vertical = True, True, True
                         pose_score = 1.0
-                        break # Found the active hand! Stop searching.
+                        sbf_latch_counter = 5  # NEW: Keep gate open for 5 frames
+                        clip_sbf_passed = True
+                        break 
                 
-                # Fallback: If no hand is reaching, just track the largest/first one
-                if not target_landmarks:
+                # NEW: If strict gate failed, but latch is active, keep it open!
+                if not target_landmarks and sbf_latch_counter > 0:
                     target_landmarks = detection_result.hand_landmarks[0]
-                    # Booleans stay False, so the CNN gate stays shut
+                    is_reaching, is_open, is_vertical = True, True, True
+                    pose_score = 0.5 # Slightly lower score while coasting
+                    sbf_latch_counter -= 1
+                elif not target_landmarks:
+                    target_landmarks = detection_result.hand_landmarks[0]
 
                 draw_skeleton(frame, target_landmarks, w, h)
                 wrist = target_landmarks[0]
@@ -219,7 +232,6 @@ for category in categories:
             # --- PROBE 3: TFLITE CNN Inference (SBF GATED) ---
             t_start = time.perf_counter()
             
-            # THE GATE: Only run the heavy math if the spatial logic passes!
             if is_reaching and is_open and is_vertical:
                 gray_1c = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2GRAY)
                 gray_3c = cv2.cvtColor(gray_1c, cv2.COLOR_GRAY2RGB)
@@ -233,19 +245,25 @@ for category in categories:
                 interpreter.invoke()
                 cnn_raw = interpreter.get_tensor(output_details[0]['index'])[0][0]
             else:
-                # Bypass the CNN entirely!
                 cnn_raw = 0.0
                 
             cnn_ms = (time.perf_counter() - t_start) * 1000
 
             # --- FUSION & ACCURACY TRACKING ---
-            fused_pred = (0.5 * cnn_raw) + (0.3 * pose_score) + (0.2 * stability_score)
-            prediction_queue.append(fused_pred)
-            avg_conf = sum(prediction_queue) / len(prediction_queue) if prediction_queue else 0.0
+            # 1. Calculate the instantaneous fused score for THIS frame
+            fused_pred = (0.4 * cnn_raw) + (0.4 * pose_score) + (0.2 * stability_score)
 
-            is_handshake_detected = (avg_conf > THRESHOLD and stability_score > 0.6)
-            if is_handshake_detected:
+            # 2. Update Autopsy Trackers
+            clip_max_stability = max(clip_max_stability, stability_score)
+            clip_max_cnn = max(clip_max_cnn, cnn_raw)
+            clip_max_avg_conf = max(clip_max_avg_conf, fused_pred)
+
+            # 3. THE INSTANT LATCH: If THIS frame is good, and the wrist has been STABLE for 10 frames, trigger!
+            if fused_pred > THRESHOLD and stability_score > 0.6:
                 system_triggered_handshake = True
+                
+            # Keep the UI colors updated
+            if system_triggered_handshake:
                 label, color, text_x = "HANDSHAKE", (50, 255, 50), 100
             else:
                 label, color, text_x = "NO HANDSHAKE", (50, 50, 255), 60
@@ -284,7 +302,7 @@ for category in categories:
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 break
 
-        # Clip-Level Accuracy Evaluation
+        # Clip-Level Accuracy Evaluation & Autopsy Reporting
         if is_actual_handshake and system_triggered_handshake:
             true_positives += 1
         elif not is_actual_handshake and system_triggered_handshake:
@@ -293,6 +311,15 @@ for category in categories:
             true_negatives += 1
         elif is_actual_handshake and not system_triggered_handshake:
             false_negatives += 1
+            # --- THE AUTOPSY PRINT ---
+            print(f"\n❌ FALSE NEGATIVE AUTOPSY: {category}/{clip_name}")
+            print(f"   -> SBF Gate Ever Opened? : {clip_sbf_passed}")
+            print(f"   -> Max Reach (Needs >{REACH_THRESHOLD}): {clip_max_reach:.3f}")
+            print(f"   -> Palm Tilt (Needs {TILT_MIN}-{TILT_MAX}): {clip_min_tilt:.1f} to {clip_max_tilt:.1f}")
+            print(f"   -> Thumb Ever Open?      : {clip_thumb_open}")
+            print(f"   -> Max Stability Score   : {clip_max_stability:.3f} (Needs >0.6)")
+            print(f"   -> Max CNN Raw Score     : {clip_max_cnn:.3f}")
+            print(f"   -> Max Fused Avg Conf    : {clip_max_avg_conf:.3f} (Needs >{THRESHOLD})\n")
 
 cv2.destroyAllWindows()
 
@@ -326,3 +353,4 @@ if valid_frame_count > 0:
     print(f"False Negatives (Miss)   : {false_negatives}")
 else:
     print("No valid frames processed to calculate metrics.")
+

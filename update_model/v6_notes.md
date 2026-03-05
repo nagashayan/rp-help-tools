@@ -634,3 +634,6 @@ stopping here for now.
 clip_11 (low handshake) and clip_12 (high handshake) in sequence_dataset_v3
 
 "The pipeline achieved an 85.7% True Positive rate with strict zero False Positives. Failure case analysis revealed two primary limitations: extreme perspective collapse during 'low' handshakes (clip_11, clip_12), and temporal misalignment where peak neural confidence and peak spatial stability failed to synchronize within the same frame during rapid gestures (clip_10)."
+
+For ICHORA deadline perspective, I will go back to last 6.9 freeze but generate new 640*480 dataset for 2 people.
+dataset will be generated to minimize multiple hands, the model is not trained and SBF is not mature enough to handle different hands so benchmark drops.
