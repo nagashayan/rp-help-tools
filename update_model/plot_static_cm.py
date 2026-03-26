@@ -7,13 +7,15 @@ import seaborn as sns
 # Format: [[True Negative, False Positive], [False Negative, True Positive]]
 
 # CNN Baseline (Extrapolated to 41 clips based on prior 20% recall / 92% specificity)
-cm_cnn = np.array([[6, 1], 
-                   [27, 7]])
-
+# cm_cnn = np.array([[6, 1], 
+#                    [27, 7]])
+cm_cnn = np.array([[0, 13], 
+                     [2, 6]])
 # Neuro-Symbolic (Exact data from your v4/v3 ablation logs)
-cm_hybrid = np.array([[7, 0], 
-                      [2, 32]])
-
+# cm_hybrid = np.array([[7, 0], 
+#                       [2, 32]])
+cm_hybrid = np.array([[1, 12], 
+                        [8, 0]])
 classes = ['No Handshake', 'Handshake']
 
 def plot_and_save_cm(cm_data, title, filename):
@@ -38,5 +40,5 @@ def plot_and_save_cm(cm_data, title, filename):
     plt.close()
 
 # Generate and save both images
-plot_and_save_cm(cm_cnn, 'CNN Baseline Sequence Performance', 'fig_cnn_sequence_confusion_matrix.png')
-plot_and_save_cm(cm_hybrid, 'Hybrid Neuro-Symbolic Performance', 'fig_neuro_symbolic_confusion_matrix.png')
+plot_and_save_cm(cm_cnn, 'CNN Baseline Sequence Performance', 'fig_cnn_adversarial_matrix.png')
+plot_and_save_cm(cm_hybrid, 'Hybrid Neuro-Symbolic Performance', 'fig_hybrid_adversarial_matrix.png')
