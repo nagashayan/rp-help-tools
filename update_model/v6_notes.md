@@ -1223,3 +1223,952 @@ my review:
 - we should also have a similar confusion matrix for adversary datasset and also mention in caption 
 this is a standard dataset
 - The pipeline or any text doesn't explain how SBF and temporal stability acts + temporal queue and diff components easily
+
+
+--- After professor feedback ---
+1. Run normal benchmarking
+python benchmarking_script_v3.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1775303418.062446 3207941 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775303418.079995 3207942 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775303418.107183 3207944 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...
+==================================================
+Processing handshake/clip_0 (90 frames)...
+W0000 00:00:1775303418.503574 3207945 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+Processing handshake/clip_1 (90 frames)...
+Processing handshake/clip_10 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_10
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.199
+   -> Palm Tilt (Needs 45-135): 0.2 to 179.5
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.940 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.351
+   -> Max Fused Avg Conf    : 0.540 (Needs >0.5)
+
+Processing handshake/clip_13 (90 frames)...
+Processing handshake/clip_14 (90 frames)...
+Processing handshake/clip_15 (90 frames)...
+Processing handshake/clip_16 (90 frames)...
+Processing handshake/clip_17 (90 frames)...
+Processing handshake/clip_18 (90 frames)...
+Processing handshake/clip_19 (90 frames)...
+Processing handshake/clip_2 (90 frames)...
+Processing handshake/clip_20 (90 frames)...
+Processing handshake/clip_23 (89 frames)...
+Processing handshake/clip_24 (90 frames)...
+Processing handshake/clip_26 (90 frames)...
+Processing handshake/clip_27 (90 frames)...
+Processing handshake/clip_28 (90 frames)...
+Processing handshake/clip_29 (90 frames)...
+Processing handshake/clip_3 (90 frames)...
+Processing handshake/clip_30 (90 frames)...
+Processing handshake/clip_31 (90 frames)...
+Processing handshake/clip_32 (90 frames)...
+Processing handshake/clip_33 (90 frames)...
+Processing handshake/clip_34 (90 frames)...
+Processing handshake/clip_35 (90 frames)...
+Processing handshake/clip_36 (90 frames)...
+Processing handshake/clip_37 (90 frames)...
+Processing handshake/clip_4 (90 frames)...
+Processing handshake/clip_41 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_41
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.116
+   -> Palm Tilt (Needs 45-135): 0.0 to 177.1
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.969 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.332
+   -> Max Fused Avg Conf    : 0.494 (Needs >0.5)
+
+Processing handshake/clip_5 (90 frames)...
+Processing handshake/clip_6 (90 frames)...
+Processing handshake/clip_7 (90 frames)...
+Processing handshake/clip_8 (90 frames)...
+Processing handshake/clip_9 (90 frames)...
+Processing none/clip_23 (89 frames)...
+Processing none/clip_28 (90 frames)...
+Processing none/clip_29 (90 frames)...
+Processing none/clip_32 (90 frames)...
+Processing none/clip_33 (90 frames)...
+Processing none/clip_35 (89 frames)...
+Processing none/clip_39 (90 frames)...
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 3682
+MediaPipe Tracking (ms)  : 26.78 ms
+Spatial SBF Logic (ms)   : 0.11 ms
+MobileNetV2 CNN (ms)     : 1.61 ms
+--------------------------------------------------
+Total Pipeline Latency   : 28.49 ms
+Estimated Real-Time FPS  : 35.1 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 32
+False Positives (Miss)   : 0
+True Negatives (Correct) : 7
+False Negatives (Miss)   : 2
+
+2. Now run with             fused_pred = (0 * cnn_raw) + (0.6 * pose_score) + (0.4 * stability_score)
+so CNN is cancelled
+
+python benchmarking_script_v3.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1775304101.469635 3216484 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775304101.484038 3216487 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775304101.498984 3216487 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...
+==================================================
+Processing handshake/clip_0 (90 frames)...
+W0000 00:00:1775304101.795461 3216488 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+Processing handshake/clip_1 (90 frames)...
+Processing handshake/clip_10 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_10
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.199
+   -> Palm Tilt (Needs 45-135): 0.2 to 179.5
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.940 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.351
+   -> Max Fused Avg Conf    : 0.600 (Needs >0.5)
+
+Processing handshake/clip_13 (90 frames)...
+Processing handshake/clip_14 (90 frames)...
+Processing handshake/clip_15 (90 frames)...
+Processing handshake/clip_16 (90 frames)...
+Processing handshake/clip_17 (90 frames)...
+Processing handshake/clip_18 (90 frames)...
+Processing handshake/clip_19 (90 frames)...
+Processing handshake/clip_2 (90 frames)...
+Processing handshake/clip_20 (90 frames)...
+Processing handshake/clip_23 (89 frames)...
+Processing handshake/clip_24 (90 frames)...
+Processing handshake/clip_26 (90 frames)...
+Processing handshake/clip_27 (90 frames)...
+Processing handshake/clip_28 (90 frames)...
+Processing handshake/clip_29 (90 frames)...
+Processing handshake/clip_3 (90 frames)...
+Processing handshake/clip_30 (90 frames)...
+Processing handshake/clip_31 (90 frames)...
+Processing handshake/clip_32 (90 frames)...
+Processing handshake/clip_33 (90 frames)...
+Processing handshake/clip_34 (90 frames)...
+Processing handshake/clip_35 (90 frames)...
+Processing handshake/clip_36 (90 frames)...
+Processing handshake/clip_37 (90 frames)...
+Processing handshake/clip_4 (90 frames)...
+Processing handshake/clip_41 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_41
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.116
+   -> Palm Tilt (Needs 45-135): 0.0 to 177.1
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.969 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.332
+   -> Max Fused Avg Conf    : 0.600 (Needs >0.5)
+
+Processing handshake/clip_5 (90 frames)...
+Processing handshake/clip_6 (90 frames)...
+Processing handshake/clip_7 (90 frames)...
+Processing handshake/clip_8 (90 frames)...
+Processing handshake/clip_9 (90 frames)...
+Processing none/clip_23 (89 frames)...
+Processing none/clip_28 (90 frames)...
+Processing none/clip_29 (90 frames)...
+Processing none/clip_32 (90 frames)...
+Processing none/clip_33 (90 frames)...
+Processing none/clip_35 (89 frames)...
+Processing none/clip_39 (90 frames)...
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 3682
+MediaPipe Tracking (ms)  : 27.00 ms
+Spatial SBF Logic (ms)   : 0.11 ms
+MobileNetV2 CNN (ms)     : 1.62 ms
+--------------------------------------------------
+Total Pipeline Latency   : 28.72 ms
+Estimated Real-Time FPS  : 34.8 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 32
+False Positives (Miss)   : 0
+True Negatives (Correct) : 7
+False Negatives (Miss)   : 2
+
+We got the exact same score.
+
+True Positives: 32
+
+False Positives: 0
+
+True Negatives: 7
+
+False Negatives: 2
+
+Your professor's challenge ("What if the CNN is eliminated?") just yielded a profound result: on your Standard Activities of Daily Living (ADL) dataset, the CNN provides zero additional benefit. The geometric rules alone correctly rejected all 7 background clips (walking, typing, etc.) and caught the exact same 32 handshakes.
+
+Why did the 2 False Negatives still happen?
+Look at your autopsy for clip_10 and clip_41:
+
+Max Fused Avg Conf : 0.600 (Needs >0.5)
+
+Max Stability Score : 0.940 (Needs >0.6)
+
+Wait a minute! If the fused confidence was 0.600, and the stability was 0.940, both of those are above your thresholds! So why did it register as a False Negative?
+
+The reason is the temporal averaging window (the prediction_queue). While the maximum instantaneous score hit 0.600, your script calculates an avg_conf over the last 10 frames. Because the handshake motion was too fast, or the hand jittered in and out of the perfect geometric angle, the rolling average over those 10 frames never quite crossed the 0.50 threshold.
+
+
+3. what if we run **without CNN** on adversary dataset?
+python benchmarking_script_v3.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1775304577.564247 3223129 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775304577.581654 3223130 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775304577.596580 3223130 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+ERROR: Please create the folder structure '../images/p1_dataset_adversarial/handshake' and '../images/p1_dataset_adversarial/none'.
+(.venv) nagashayanaramamurthy@Nagas-MacBook-Pro update_model % clear
+(.venv) nagashayanaramamurthy@Nagas-MacBook-Pro update_model % python benchmarking_script_v3.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1775304655.089443 3224525 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775304655.106357 3224527 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775304655.121265 3224527 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...
+==================================================
+Processing handshake/clip_11 (90 frames)...
+W0000 00:00:1775304655.426333 3224527 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_11
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.091
+   -> Palm Tilt (Needs 45-135): 0.6 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.988 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.395 (Needs >0.5)
+
+Processing handshake/clip_12 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_12
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.061
+   -> Palm Tilt (Needs 45-135): 0.0 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.957 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.383 (Needs >0.5)
+
+Processing handshake/clip_21 (90 frames)...
+Processing handshake/clip_22 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_22
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.093
+   -> Palm Tilt (Needs 45-135): 38.2 to 178.9
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.960 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.384 (Needs >0.5)
+
+Processing handshake/clip_25 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_25
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.307
+   -> Palm Tilt (Needs 45-135): 59.4 to 93.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.531 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.210
+   -> Max Fused Avg Conf    : 0.803 (Needs >0.5)
+
+Processing handshake/clip_38 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_38
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.373
+   -> Palm Tilt (Needs 45-135): 22.6 to 176.8
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.586 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.780
+   -> Max Fused Avg Conf    : 0.834 (Needs >0.5)
+
+Processing handshake/clip_39 (90 frames)...
+Processing handshake/clip_40 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_40
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.037
+   -> Palm Tilt (Needs 45-135): 25.7 to 179.8
+   -> Thumb Ever Open?      : False
+   -> Max Stability Score   : 0.974 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.390 (Needs >0.5)
+
+Processing none/clip_21 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_21
+   -> Max CNN Raw Score : 0.353
+   -> Max Fused Avg Conf: 0.969 (Crossed 0.5)
+Processing none/clip_22 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_22
+   -> Max CNN Raw Score : 0.289
+   -> Max Fused Avg Conf: 0.967 (Crossed 0.5)
+Processing none/clip_24 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_24
+   -> Max CNN Raw Score : 0.384
+   -> Max Fused Avg Conf: 0.950 (Crossed 0.5)
+Processing none/clip_25 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_25
+   -> Max CNN Raw Score : 0.222
+   -> Max Fused Avg Conf: 0.921 (Crossed 0.5)
+Processing none/clip_26 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_26
+   -> Max CNN Raw Score : 0.236
+   -> Max Fused Avg Conf: 0.976 (Crossed 0.5)
+Processing none/clip_27 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_27
+   -> Max CNN Raw Score : 0.349
+   -> Max Fused Avg Conf: 0.977 (Crossed 0.5)
+Processing none/clip_30 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_30
+   -> Max CNN Raw Score : 0.595
+   -> Max Fused Avg Conf: 0.966 (Crossed 0.5)
+Processing none/clip_31 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_31
+   -> Max CNN Raw Score : 0.797
+   -> Max Fused Avg Conf: 0.983 (Crossed 0.5)
+Processing none/clip_34 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_34
+   -> Max CNN Raw Score : 0.507
+   -> Max Fused Avg Conf: 0.984 (Crossed 0.5)
+Processing none/clip_36 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_36
+   -> Max CNN Raw Score : 0.736
+   -> Max Fused Avg Conf: 0.600 (Crossed 0.5)
+Processing none/clip_37 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_37
+   -> Max CNN Raw Score : 0.752
+   -> Max Fused Avg Conf: 0.976 (Crossed 0.5)
+Processing none/clip_38 (89 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_38
+   -> Max CNN Raw Score : 0.845
+   -> Max Fused Avg Conf: 0.957 (Crossed 0.5)
+Processing none/clip_40 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_40
+   -> Max CNN Raw Score : 0.605
+   -> Max Fused Avg Conf: 0.981 (Crossed 0.5)
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 1884
+MediaPipe Tracking (ms)  : 25.83 ms
+Spatial SBF Logic (ms)   : 0.09 ms
+MobileNetV2 CNN (ms)     : 1.17 ms
+--------------------------------------------------
+Total Pipeline Latency   : 27.09 ms
+Estimated Real-Time FPS  : 36.9 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 2
+False Positives (Miss)   : 13
+True Negatives (Correct) : 0
+False Negatives (Miss)   : 6
+
+4. Lets try with CNN same old weight now
+
+            fused_pred = (0.4 * cnn_raw) + (0.4 * pose_score) + (0.2 * stability_score)
+
+
+python benchmarking_script_v3.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+I0000 00:00:1775304925.915471 3229260 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775304925.932446 3229262 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775304925.947478 3229262 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...
+==================================================
+Processing handshake/clip_11 (90 frames)...
+W0000 00:00:1775304926.258078 3229266 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_11
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.091
+   -> Palm Tilt (Needs 45-135): 0.6 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.988 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.198 (Needs >0.5)
+
+Processing handshake/clip_12 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_12
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.061
+   -> Palm Tilt (Needs 45-135): 0.0 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.957 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.191 (Needs >0.5)
+
+Processing handshake/clip_21 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_21
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.060
+   -> Palm Tilt (Needs 45-135): 2.6 to 178.6
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.804 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.186
+   -> Max Fused Avg Conf    : 0.447 (Needs >0.5)
+
+Processing handshake/clip_22 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_22
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.093
+   -> Palm Tilt (Needs 45-135): 38.2 to 178.9
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.960 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.192 (Needs >0.5)
+
+Processing handshake/clip_25 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_25
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.307
+   -> Palm Tilt (Needs 45-135): 59.4 to 93.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.531 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.210
+   -> Max Fused Avg Conf    : 0.581 (Needs >0.5)
+
+Processing handshake/clip_38 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_38
+   -> SBF Gate Ever Opened? : True
+   -> Max Reach (Needs >0.05): 0.373
+   -> Palm Tilt (Needs 45-135): 22.6 to 176.8
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.586 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.780
+   -> Max Fused Avg Conf    : 0.730 (Needs >0.5)
+
+Processing handshake/clip_39 (90 frames)...
+Processing handshake/clip_40 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_40
+   -> SBF Gate Ever Opened? : False
+   -> Max Reach (Needs >0.05): 0.037
+   -> Palm Tilt (Needs 45-135): 25.7 to 179.8
+   -> Thumb Ever Open?      : False
+   -> Max Stability Score   : 0.974 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.195 (Needs >0.5)
+
+Processing none/clip_21 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_21
+   -> Max CNN Raw Score : 0.353
+   -> Max Fused Avg Conf: 0.718 (Crossed 0.5)
+Processing none/clip_22 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_22
+   -> Max CNN Raw Score : 0.289
+   -> Max Fused Avg Conf: 0.657 (Crossed 0.5)
+Processing none/clip_24 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_24
+   -> Max CNN Raw Score : 0.384
+   -> Max Fused Avg Conf: 0.660 (Crossed 0.5)
+Processing none/clip_25 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_25
+   -> Max CNN Raw Score : 0.222
+   -> Max Fused Avg Conf: 0.606 (Crossed 0.5)
+Processing none/clip_26 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_26
+   -> Max CNN Raw Score : 0.236
+   -> Max Fused Avg Conf: 0.624 (Crossed 0.5)
+Processing none/clip_27 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_27
+   -> Max CNN Raw Score : 0.349
+   -> Max Fused Avg Conf: 0.671 (Crossed 0.5)
+Processing none/clip_30 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_30
+   -> Max CNN Raw Score : 0.595
+   -> Max Fused Avg Conf: 0.812 (Crossed 0.5)
+Processing none/clip_31 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_31
+   -> Max CNN Raw Score : 0.797
+   -> Max Fused Avg Conf: 0.731 (Crossed 0.5)
+Processing none/clip_34 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_34
+   -> Max CNN Raw Score : 0.507
+   -> Max Fused Avg Conf: 0.728 (Crossed 0.5)
+Processing none/clip_36 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_36
+   -> Max CNN Raw Score : 0.736
+   -> Max Fused Avg Conf: 0.654 (Crossed 0.5)
+Processing none/clip_37 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_37
+   -> Max CNN Raw Score : 0.752
+   -> Max Fused Avg Conf: 0.812 (Crossed 0.5)
+Processing none/clip_38 (89 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_38
+   -> Max CNN Raw Score : 0.845
+   -> Max Fused Avg Conf: 0.863 (Crossed 0.5)
+Processing none/clip_40 (90 frames)...
+
+⚠️ FALSE POSITIVE DETECTED: none/clip_40
+   -> Max CNN Raw Score : 0.605
+   -> Max Fused Avg Conf: 0.645 (Crossed 0.5)
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 1884
+MediaPipe Tracking (ms)  : 25.08 ms
+Spatial SBF Logic (ms)   : 0.10 ms
+MobileNetV2 CNN (ms)     : 1.17 ms
+--------------------------------------------------
+Total Pipeline Latency   : 26.35 ms
+Estimated Real-Time FPS  : 38.0 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 1
+False Positives (Miss)   : 13
+True Negatives (Correct) : 0
+False Negatives (Miss)   : 7
+
+so the difference is negligible. CNN is not adding any value for now.
+
+GM Ashwin,
+You are right, CNN currently not adding any value. 
+
+standard dataset consists of normal handshakes by 2 people in diff in height, clothes, light settings, backgrounds, 1 person in a frame at a time.
+none clips consists of high fives, hellos etc
+
+adversary dataset (complicated env than standard dataset)  consists of handshakes by 2 people in diff in height, clothes, light settings, backgrounds, multiple hands, multiple people with multiple hands
+none clips consists of near pattern of handshakes like holding a cup, showing numbers in hand - basically trying to satisfy geometry with hand gestures but not handshake
+
+Adversarial Clip,Without CNN (CNN Raw),Without CNN (Fusion),With CNN (CNN Raw),With CNN (Fusion),Outcome Shift
+Valid Handshakes,,,,,
+clip_11,0.000,0.395 (FN),0.000,0.198 (FN),Missed in both
+clip_12,0.000,0.383 (FN),0.000,0.191 (FN),Missed in both
+clip_21,(Not Logged),> 0.500 (Hit/TP),0.186,0.447 (FN),❌ Worse with CNN
+clip_22,0.000,0.384 (FN),0.000,0.192 (FN),Missed in both
+clip_25,0.210,0.803 (FN)*,0.210,0.581 (FN)*,Missed in both
+clip_38,0.780,0.834 (FN)*,0.780,0.730 (FN)*,Missed in both
+clip_39,(Not Logged),> 0.500 (Hit/TP),(Not Logged),> 0.500 (Hit/TP),Perfect in both
+clip_40,0.000,0.390 (FN),0.000,0.195 (FN),Missed in both
+,,,,,
+"Negative Gestures (High-Fives, Waves, Objects)",,,,,
+none/clip_21,0.353,0.969 (FP),0.353,0.718 (FP),False Positive in both
+none/clip_22,0.289,0.967 (FP),0.289,0.657 (FP),False Positive in both
+none/clip_24,0.384,0.950 (FP),0.384,0.660 (FP),False Positive in both
+none/clip_25,0.222,0.921 (FP),0.222,0.606 (FP),False Positive in both
+none/clip_26,0.236,0.976 (FP),0.236,0.624 (FP),False Positive in both
+none/clip_27,0.349,0.977 (FP),0.349,0.671 (FP),False Positive in both
+none/clip_30,0.595,0.966 (FP),0.595,0.812 (FP),False Positive in both
+none/clip_31,0.797,0.983 (FP),0.797,0.731 (FP),False Positive in both
+none/clip_34,0.507,0.984 (FP),0.507,0.728 (FP),False Positive in both
+none/clip_36,0.736,0.600 (FP),0.736,0.654 (FP),False Positive in both
+none/clip_37,0.752,0.976 (FP),0.752,0.812 (FP),False Positive in both
+none/clip_38,0.845,0.957 (FP),0.845,0.863 (FP),False Positive in both
+none/clip_40,0.605,0.981 (FP),0.605,0.645 (FP),False Positive in both
+
+
+--- if we reduce stability from 0.6 to 0.5
+
+
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+==================================================
+🚀 STARTING NESTED BATCH BENCHMARK ON MAC (WITH AUTOPSY)...
+📁 DATASET: p1_dataset_adversaries
+==================================================
+Processing handshake/clip_11 (90 frames)...
+W0000 00:00:1775418480.554574 3521337 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_11
+   -> SBF Gate Ever Opened? : False
+   -> Handedness Tracked    : Right, Left (Passed SBF: None)
+   -> Wrist Y-Axis Range    : 0.451 to 0.704 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.091
+   -> Palm Tilt (Needs 45-135): 0.6 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.988 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.395 (Needs >0.5)
+
+Processing handshake/clip_12 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_12
+   -> SBF Gate Ever Opened? : False
+   -> Handedness Tracked    : Right, Left (Passed SBF: None)
+   -> Wrist Y-Axis Range    : 0.441 to 0.686 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.061
+   -> Palm Tilt (Needs 45-135): 0.0 to 179.2
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.957 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.383 (Needs >0.5)
+
+Processing handshake/clip_21 (90 frames)...
+
+✅ TRUE POSITIVE AUTOPSY: handshake/clip_21
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.423 to 0.776 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.060
+   -> Palm Tilt (Needs 45-135): 2.6 to 178.6
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.804 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.186
+   -> Max Fused Avg Conf    : 0.600 (Needs >0.5)
+
+Processing handshake/clip_22 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_22
+   -> SBF Gate Ever Opened? : False
+   -> Handedness Tracked    : Right, Left (Passed SBF: None)
+   -> Wrist Y-Axis Range    : 0.584 to 0.916 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.093
+   -> Palm Tilt (Needs 45-135): 38.2 to 178.9
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.960 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.384 (Needs >0.5)
+
+Processing handshake/clip_25 (90 frames)...
+
+✅ TRUE POSITIVE AUTOPSY: handshake/clip_25
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.571 to 0.952 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.307
+   -> Palm Tilt (Needs 45-135): 59.4 to 93.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.531 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.210
+   -> Max Fused Avg Conf    : 0.803 (Needs >0.5)
+
+Processing handshake/clip_38 (90 frames)...
+
+✅ TRUE POSITIVE AUTOPSY: handshake/clip_38
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.458 to 0.891 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.373
+   -> Palm Tilt (Needs 45-135): 22.6 to 176.8
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.586 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.780
+   -> Max Fused Avg Conf    : 0.834 (Needs >0.5)
+
+Processing handshake/clip_39 (90 frames)...
+
+✅ TRUE POSITIVE AUTOPSY: handshake/clip_39
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.405 to 0.808 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.055
+   -> Palm Tilt (Needs 45-135): 0.1 to 176.9
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.985 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.325
+   -> Max Fused Avg Conf    : 0.887 (Needs >0.5)
+
+Processing handshake/clip_40 (90 frames)...
+
+❌ FALSE NEGATIVE AUTOPSY: handshake/clip_40
+   -> SBF Gate Ever Opened? : False
+   -> Handedness Tracked    : Right, Left (Passed SBF: None)
+   -> Wrist Y-Axis Range    : 0.441 to 0.784 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.037
+   -> Palm Tilt (Needs 45-135): 25.7 to 179.8
+   -> Thumb Ever Open?      : False
+   -> Max Stability Score   : 0.974 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.000
+   -> Max Fused Avg Conf    : 0.390 (Needs >0.5)
+
+Processing none/clip_21 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_21
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.348 to 0.706 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.112
+   -> Palm Tilt (Needs 45-135): 39.7 to 167.1
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.923 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.353
+   -> Max Fused Avg Conf    : 0.969 (Needs >0.5)
+
+Processing none/clip_22 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_22
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.241 to 0.706 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.136
+   -> Palm Tilt (Needs 45-135): 39.7 to 110.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.917 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.289
+   -> Max Fused Avg Conf    : 0.967 (Needs >0.5)
+
+Processing none/clip_24 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_24
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.309 to 0.692 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.319
+   -> Palm Tilt (Needs 45-135): 59.8 to 178.8
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.876 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.384
+   -> Max Fused Avg Conf    : 0.950 (Needs >0.5)
+
+Processing none/clip_25 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_25
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.304 to 0.685 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.209
+   -> Palm Tilt (Needs 45-135): 9.9 to 171.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.904 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.222
+   -> Max Fused Avg Conf    : 0.921 (Needs >0.5)
+
+Processing none/clip_26 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_26
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.389 to 0.713 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.118
+   -> Palm Tilt (Needs 45-135): 3.7 to 134.9
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.940 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.236
+   -> Max Fused Avg Conf    : 0.976 (Needs >0.5)
+
+Processing none/clip_27 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_27
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.320 to 0.615 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.133
+   -> Palm Tilt (Needs 45-135): 36.7 to 137.8
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.942 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.349
+   -> Max Fused Avg Conf    : 0.977 (Needs >0.5)
+
+Processing none/clip_30 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_30
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.351 to 0.706 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.297
+   -> Palm Tilt (Needs 45-135): 9.6 to 172.1
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.916 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.595
+   -> Max Fused Avg Conf    : 0.966 (Needs >0.5)
+
+Processing none/clip_31 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_31
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.574 to 0.741 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.162
+   -> Palm Tilt (Needs 45-135): 88.0 to 129.5
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.958 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.797
+   -> Max Fused Avg Conf    : 0.983 (Needs >0.5)
+
+Processing none/clip_34 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_34
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.315 to 0.644 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.186
+   -> Palm Tilt (Needs 45-135): 8.1 to 156.4
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.959 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.507
+   -> Max Fused Avg Conf    : 0.984 (Needs >0.5)
+
+Processing none/clip_36 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_36
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.452 to 0.864 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.055
+   -> Palm Tilt (Needs 45-135): 13.3 to 70.4
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.969 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.736
+   -> Max Fused Avg Conf    : 0.600 (Needs >0.5)
+
+Processing none/clip_37 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_37
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Right)
+   -> Wrist Y-Axis Range    : 0.371 to 0.751 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.245
+   -> Palm Tilt (Needs 45-135): 51.6 to 140.4
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.941 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.752
+   -> Max Fused Avg Conf    : 0.976 (Needs >0.5)
+
+Processing none/clip_38 (89 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_38
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.449 to 0.670 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.174
+   -> Palm Tilt (Needs 45-135): 2.8 to 176.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.893 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.845
+   -> Max Fused Avg Conf    : 0.957 (Needs >0.5)
+
+Processing none/clip_40 (90 frames)...
+
+⚠️ FALSE POSITIVE AUTOPSY: none/clip_40
+   -> SBF Gate Ever Opened? : True
+   -> Handedness Tracked    : Right, Left (Passed SBF: Left)
+   -> Wrist Y-Axis Range    : 0.176 to 0.855 (0=Top, 1=Bottom)
+   -> Max Reach (Needs >0.05): 0.119
+   -> Palm Tilt (Needs 45-135): 75.1 to 171.3
+   -> Thumb Ever Open?      : True
+   -> Max Stability Score   : 0.951 (Needs >0.6)
+   -> Max CNN Raw Score     : 0.605
+   -> Max Fused Avg Conf    : 0.981 (Needs >0.5)
+
+
+==================================================
+📊 FINAL HARDWARE INFERENCE LATENCY (Averaged)
+==================================================
+Total Frames Benchmarked : 1884
+MediaPipe Tracking (ms)  : 27.37 ms
+Spatial SBF Logic (ms)   : 0.10 ms
+MobileNetV2 CNN (ms)     : 1.19 ms
+--------------------------------------------------
+Total Pipeline Latency   : 28.66 ms
+Estimated Real-Time FPS  : 34.9 FPS
+
+==================================================
+🎯 DYNAMIC SEQUENCE ACCURACY (Clip-Level)
+==================================================
+True Positives (Hit)     : 4
+False Positives (Miss)   : 13
+True Negatives (Correct) : 0
+False Negatives (Miss)   : 4
+
+--- should we consider y axis?
+
+
+
+4. what if I use latest mediapipe and try to tune geometry to see both hands and pick one near by? can that solve adversal dataset problem?
+
