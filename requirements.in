@@ -5,3 +5,5 @@ pyparsing
 matplotlib
 # Development
 tox
+optree # To use Keras, you need to have `optree` installed
+rich

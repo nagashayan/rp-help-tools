@@ -2168,7 +2168,593 @@ False Negatives (Miss)   : 4
 
 --- should we consider y axis?
 
+so my dataset is like this, I have 626 images of handshake(306) and diff action(326) which are non handshakes and then sequence dataset of 41 videos frames extracted (90 per video approx) handshake 42 and non handshake 20.
+
+
+
+previously I used 626 static images to train cnn and then sequence dataset to evaluated cnn. when cnn failed badly on 8 handshakes and 13 non handshakes I called them adversary dataset
+
+Go ahead and run the train_decision_tree.py script I provided earlier! Make sure the BENCHMARK_DIR in the script points exactly to that adversarial dataset folder.
+
+Paste the output text of the tree here. It’s going to literally print out the if/else rules it learned, and we can see exactly what math it used to solve the high-five problem!
 
 
 4. what if I use latest mediapipe and try to tune geometry to see both hands and pick one near by? can that solve adversal dataset problem?
 
+we picked one hand using geometry and fed the data to decision tree to see the conditions it might generate
+
+
+ python train_decision_tree.py 
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🌳 EXTRACTING FEATURES FOR DECISION TREE...
+==================================================
+I0000 00:00:1775474679.163484 3605747 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775474679.181911 3605749 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775474679.198008 3605754 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775474679.253089 3605752 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+Extraction Complete! Extracted 855 valid hand frames.
+
+==================================================
+🤖 DECISION TREE RULES LEARNED:
+==================================================
+|--- Thumb_Distance <= 0.06
+|   |--- Reach_Z <= 0.09
+|   |   |--- Reach_Z <= 0.02
+|   |   |   |--- Reach_Z <= -0.01
+|   |   |   |   |--- class: 0
+|   |   |   |--- Reach_Z >  -0.01
+|   |   |   |   |--- class: 1
+|   |   |--- Reach_Z >  0.02
+|   |   |   |--- Palm_Tilt <= 100.56
+|   |   |   |   |--- class: 0
+|   |   |   |--- Palm_Tilt >  100.56
+|   |   |   |   |--- class: 1
+|   |--- Reach_Z >  0.09
+|   |   |--- Palm_Tilt <= 95.27
+|   |   |   |--- Thumb_Distance <= 0.03
+|   |   |   |   |--- class: 0
+|   |   |   |--- Thumb_Distance >  0.03
+|   |   |   |   |--- class: 0
+|   |   |--- Palm_Tilt >  95.27
+|   |   |   |--- Reach_Z <= 0.15
+|   |   |   |   |--- class: 0
+|   |   |   |--- Reach_Z >  0.15
+|   |   |   |   |--- class: 1
+|--- Thumb_Distance >  0.06
+|   |--- Palm_Tilt <= 40.20
+|   |   |--- Reach_Z <= 0.04
+|   |   |   |--- class: 1
+|   |   |--- Reach_Z >  0.04
+|   |   |   |--- Palm_Tilt <= 25.90
+|   |   |   |   |--- class: 0
+|   |   |   |--- Palm_Tilt >  25.90
+|   |   |   |   |--- class: 1
+|   |--- Palm_Tilt >  40.20
+|   |   |--- Reach_Z <= 0.25
+|   |   |   |--- Wrist_Altitude_Y <= 0.68
+|   |   |   |   |--- class: 0
+|   |   |   |--- Wrist_Altitude_Y >  0.68
+|   |   |   |   |--- class: 0
+|   |   |--- Reach_Z >  0.25
+|   |   |   |--- Palm_Tilt <= 122.38
+|   |   |   |   |--- class: 1
+|   |   |   |--- Palm_Tilt >  122.38
+|   |   |   |   |--- class: 0
+
+
+==================================================
+📊 ML ACCURACY ON INDIVIDUAL FRAMES:
+==================================================
+              precision    recall  f1-score   support
+
+No Handshake       0.89      0.97      0.93       503
+   Handshake       0.95      0.83      0.89       352
+
+    accuracy                           0.91       855
+   macro avg       0.92      0.90      0.91       855
+weighted avg       0.92      0.91      0.91       855
+
+
+
+so without knowing we are mirroing the google mediapipe gesture recognizer architecture
+
+- Take 21 raw coordinates and feed to classfication model
+
+what we are doing
+- Take 4 raw coordinates and feed to decision tree.
+
+lets analyze the results of decision tree trained on static images + adversary dataset
+
+ python train_decision_tree_combined.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🌳 EXTRACTING FEATURES FROM COMBINED DATASETS...
+==================================================
+I0000 00:00:1775475966.408308 3621337 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775475966.424234 3621340 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775475966.438363 3621344 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+Scanning Static Images in ../images/train_dataset_v2...
+W0000 00:00:1775475966.626993 3621340 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+Scanning Adversary Sequences in ../images/p1_dataset_adversaries...
+
+Extraction Complete! Total valid hand frames: 1244
+
+==================================================
+🤖 DECISION TREE RULES LEARNED:
+==================================================
+|--- Reach_Z <= 0.02
+|   |--- Wrist_Altitude_Y <= 0.44
+|   |   |--- Palm_Tilt <= 80.74
+|   |   |   |--- Reach_Z <= 0.02
+|   |   |   |   |--- class: 0
+|   |   |   |--- Reach_Z >  0.02
+|   |   |   |   |--- class: 0
+|   |   |--- Palm_Tilt >  80.74
+|   |   |   |--- Thumb_Distance <= 0.05
+|   |   |   |   |--- class: 0
+|   |   |   |--- Thumb_Distance >  0.05
+|   |   |   |   |--- class: 1
+|   |--- Wrist_Altitude_Y >  0.44
+|   |   |--- Thumb_Distance <= 0.09
+|   |   |   |--- Reach_Z <= -0.01
+|   |   |   |   |--- class: 0
+|   |   |   |--- Reach_Z >  -0.01
+|   |   |   |   |--- class: 1
+|   |   |--- Thumb_Distance >  0.09
+|   |   |   |--- Wrist_Altitude_Y <= 0.48
+|   |   |   |   |--- class: 1
+|   |   |   |--- Wrist_Altitude_Y >  0.48
+|   |   |   |   |--- class: 0
+|--- Reach_Z >  0.02
+|   |--- Reach_Z <= 0.25
+|   |   |--- Thumb_Distance <= 0.07
+|   |   |   |--- Palm_Tilt <= 95.18
+|   |   |   |   |--- class: 0
+|   |   |   |--- Palm_Tilt >  95.18
+|   |   |   |   |--- class: 1
+|   |   |--- Thumb_Distance >  0.07
+|   |   |   |--- Wrist_Altitude_Y <= 0.45
+|   |   |   |   |--- class: 0
+|   |   |   |--- Wrist_Altitude_Y >  0.45
+|   |   |   |   |--- class: 0
+|   |--- Reach_Z >  0.25
+|   |   |--- Palm_Tilt <= 143.55
+|   |   |   |--- Palm_Tilt <= 45.19
+|   |   |   |   |--- class: 0
+|   |   |   |--- Palm_Tilt >  45.19
+|   |   |   |   |--- class: 1
+|   |   |--- Palm_Tilt >  143.55
+|   |   |   |--- Thumb_Distance <= 0.16
+|   |   |   |   |--- class: 0
+|   |   |   |--- Thumb_Distance >  0.16
+|   |   |   |   |--- class: 1
+
+
+==================================================
+📊 ML ACCURACY ON COMBINED DATASET:
+==================================================
+              precision    recall  f1-score   support
+
+No Handshake       0.79      0.87      0.83       698
+   Handshake       0.81      0.71      0.75       546
+
+    accuracy                           0.80      1244
+   macro avg       0.80      0.79      0.79      1244
+weighted avg       0.80      0.80      0.80      1244
+
+then lets try both feeding 4 raw coordinates and 21 coordinates to classificaation model
+
+but google did action recognition on static image but we are doing on sequential datset, here few frames
+can make major difference so it's much harder problem?
+
+nobody attempted it so far?
+
+There are few things ppl do, usually it's 3rd person camera only meta ego4d or egoblind dataset is close?
+ppl used classically these things
+
+Dynamic Time Warping (DTW): This algorithm measures the similarity between two temporal sequences that might vary in speed. If one person shakes hands fast and another shakes hands slow, DTW stretches the time axis to see if the core "shape" of the movement matches.
+
+Hidden Markov Models (HMMs): Researchers used HMMs to calculate the probability of moving from one state to another (e.g., the probability that an "arm raised" state will be followed by an "arm dropping" state).
+
+2. The Neural Network Era (What Google and Meta do)
+When you ask how the big tech companies solve sequential video datasets, they use massive architectures that look at both space (X/Y pixels) and time (Z sequences) simultaneously:
+
+LSTMs (Long Short-Term Memory): Researchers take the exact 3D skeletal coordinates you are extracting (Reach, Tilt, Altitude) and feed them into an LSTM. LSTMs are networks with "memory." They remember that 5 frames ago the hand was up high, so when the hand drops low, the LSTM knows it's a wave, not a handshake.
+
+Two-Stream CNNs: This is a famous architecture. Stream 1 looks at the static RGB image. Stream 2 looks at "Optical Flow" (a heat map of which direction pixels are moving).
+
+3D CNNs (like I3D): Instead of a 2D image (Height × Width), they feed the network a 3D block of video (Time × Height × Width). The CNN learns the physical shape of motion.
+
+The Ultimate Hybrid Pipeline (Your Final System)
+This is what your final system should be:
+
+The SBF Gate (Geometry): We use very relaxed, broad rules (e.g., Reach > 0.05, Tilt between 15-165). It will let the high-fives pass through, but it guarantees it will never miss a real handshake. Its only job is to wake the system up.
+
+The Temporal Latch: We wait for the hand to be stable for a few frames.
+
+The Custom CNN: We train a tiny, 3-layer Convolutional Neural Network from scratch on your 626 static images. Because it only runs when the SBF gate opens, it saves massive battery life. And because it looks at texture/pixels instead of geometry, it will instantly realize a high-five looks different than a handshake.
+
+train on static image:
+
+python train_custom_cnn.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🧠 TRAINING CUSTOM 3-LAYER CNN FOR EDGE DEVICES
+==================================================
+Loading dataset...
+Found 626 files belonging to 2 classes.
+Using 501 files for training.
+Found 626 files belonging to 2 classes.
+Using 125 files for validation.
+Model: "sequential_1"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ sequential (Sequential)              │ (None, 160, 160, 1)         │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ rescaling (Rescaling)                │ (None, 160, 160, 1)         │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ conv2d (Conv2D)                      │ (None, 160, 160, 16)        │             160 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d (MaxPooling2D)         │ (None, 80, 80, 16)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ conv2d_1 (Conv2D)                    │ (None, 80, 80, 32)          │           4,640 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d_1 (MaxPooling2D)       │ (None, 40, 40, 32)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ conv2d_2 (Conv2D)                    │ (None, 40, 40, 64)          │          18,496 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ max_pooling2d_2 (MaxPooling2D)       │ (None, 20, 20, 64)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dropout (Dropout)                    │ (None, 20, 20, 64)          │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ flatten (Flatten)                    │ (None, 25600)               │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense (Dense)                        │ (None, 64)                  │       1,638,464 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dense_1 (Dense)                      │ (None, 1)                   │              65 │
+└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
+ Total params: 1,661,825 (6.34 MB)
+ Trainable params: 1,661,825 (6.34 MB)
+ Non-trainable params: 0 (0.00 B)
+
+🚀 Starting Training...
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 3s 114ms/step - accuracy: 0.4824 - loss: 0.8555 - val_accuracy: 0.4560 - val_loss: 0.6959
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 109ms/step - accuracy: 0.5027 - loss: 0.6894 - val_accuracy: 0.4560 - val_loss: 0.6927
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 113ms/step - accuracy: 0.5167 - loss: 0.6859 - val_accuracy: 0.4560 - val_loss: 0.6874
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 125ms/step - accuracy: 0.5121 - loss: 0.6849 - val_accuracy: 0.4560 - val_loss: 0.6913
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 4s 228ms/step - accuracy: 0.5621 - loss: 0.6518 - val_accuracy: 0.6640 - val_loss: 0.6622
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 3s 147ms/step - accuracy: 0.6390 - loss: 0.6607 - val_accuracy: 0.6960 - val_loss: 0.6491
+Epoch 7/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 109ms/step - accuracy: 0.6560 - loss: 0.6627 - val_accuracy: 0.6400 - val_loss: 0.6509
+Epoch 8/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 106ms/step - accuracy: 0.6428 - loss: 0.6386 - val_accuracy: 0.6960 - val_loss: 0.6268
+Epoch 9/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 113ms/step - accuracy: 0.7176 - loss: 0.6163 - val_accuracy: 0.7360 - val_loss: 0.6176
+Epoch 10/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 100ms/step - accuracy: 0.7004 - loss: 0.6228 - val_accuracy: 0.6880 - val_loss: 0.6231
+Epoch 11/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 1s 93ms/step - accuracy: 0.7004 - loss: 0.5914 - val_accuracy: 0.7360 - val_loss: 0.6225
+Epoch 12/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 102ms/step - accuracy: 0.6947 - loss: 0.6116 - val_accuracy: 0.7360 - val_loss: 0.6030
+Epoch 13/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 106ms/step - accuracy: 0.6971 - loss: 0.6117 - val_accuracy: 0.6960 - val_loss: 0.6002
+Epoch 14/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 98ms/step - accuracy: 0.7592 - loss: 0.5937 - val_accuracy: 0.7200 - val_loss: 0.5954
+Epoch 15/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 1s 85ms/step - accuracy: 0.7204 - loss: 0.5933 - val_accuracy: 0.7680 - val_loss: 0.5856
+
+==================================================
+📦 EXPORTING TFLITE MODEL...
+==================================================
+Saved artifact at '/var/folders/vm/s5xwrxd93_xbnhp70qvyw03w0000gq/T/tmpogfe9abl'. The following endpoints are available:
+
+* Endpoint 'serve'
+  args_0 (POSITIONAL_ONLY): TensorSpec(shape=(None, 160, 160, 1), dtype=tf.float32, name='keras_tensor')
+Output Type:
+  TensorSpec(shape=(None, 1), dtype=tf.float32, name=None)
+Captures:
+  5891714736: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891713680: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891746096: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891745920: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891747680: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891777808: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891778864: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891778688: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891780448: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5891780096: TensorSpec(shape=(), dtype=tf.resource, name=None)
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1775477132.990602 3633733 tf_tfl_flatbuffer_helpers.cc:364] Ignored output_format.
+W0000 00:00:1775477132.990630 3633733 tf_tfl_flatbuffer_helpers.cc:367] Ignored drop_control_dependency.
+I0000 00:00:1775477132.994946 3633733 mlir_graph_optimization_pass.cc:437] MLIR V1 optimization pass is not enabled
+✅ Success! Custom edge model saved as: custom_handshake_cnn.tflite
+File Size: 1630.30 KB
+
+"Why did you bother building the SBF Geometry gate at all? Just run the CNN!" But look at the data we have gathered today:
+
+Pure Geometry (SBF): Maxes out at ~80% because it gets confused by the downward sweep of a high-five.
+
+Pure Texture (Custom CNN): Maxes out at ~77% because a tiny 3-layer network on a small dataset can still get confused by weird lighting or background shapes.
+
+The Conclusion: Neither system can survive the real world alone. The only way to achieve state-of-the-art accuracy on an edge device is to fuse them together. The SBF catches the 3D intent, and the CNN verifies the 2D texture.
+
+Feeding mediapipe data to custom CNN
+
+ python benchmark_custom_cnn.py 
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🚀 INITIALIZING HYBRID GATED PIPELINE (IEEE FINAL)
+==================================================
+I0000 00:00:1775477911.567189 3645860 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775477911.578589 3645863 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775477911.600687 3645863 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+Evaluating Category: NONE
+W0000 00:00:1775477911.711684 3645862 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT] Clip: clip_28 | Triggered: False | Max CNN Score: 0.531
+[✅ CORRECT] Clip: clip_29 | Triggered: False | Max CNN Score: 0.536
+[✅ CORRECT] Clip: clip_33 | Triggered: False | Max CNN Score: 0.258
+[✅ CORRECT] Clip: clip_35 | Triggered: False | Max CNN Score: 0.000
+[✅ CORRECT] Clip: clip_32 | Triggered: False | Max CNN Score: 0.213
+[✅ CORRECT] Clip: clip_23 | Triggered: False | Max CNN Score: 0.536
+[✅ CORRECT] Clip: clip_39 | Triggered: False | Max CNN Score: 0.236
+
+Evaluating Category: HANDSHAKE
+[❌ FAIL] Clip: clip_10 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_28 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_17 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_19 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_26 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_18 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_27 | Triggered: False | Max CNN Score: 0.378
+[❌ FAIL] Clip: clip_20 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_29 | Triggered: False | Max CNN Score: 0.522
+[❌ FAIL] Clip: clip_16 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_4 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_3 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_2 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_5 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_33 | Triggered: False | Max CNN Score: 0.208
+[❌ FAIL] Clip: clip_34 | Triggered: False | Max CNN Score: 0.183
+[❌ FAIL] Clip: clip_35 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_32 | Triggered: False | Max CNN Score: 0.518
+[❌ FAIL] Clip: clip_14 | Triggered: False | Max CNN Score: 0.531
+[❌ FAIL] Clip: clip_13 | Triggered: False | Max CNN Score: 0.000
+[❌ FAIL] Clip: clip_23 | Triggered: False | Max CNN Score: 0.514
+[❌ FAIL] Clip: clip_24 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_15 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_41 | Triggered: False | Max CNN Score: 0.000
+[❌ FAIL] Clip: clip_9 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_0 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_7 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_6 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_1 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_8 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_37 | Triggered: False | Max CNN Score: 0.413
+[❌ FAIL] Clip: clip_30 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_31 | Triggered: False | Max CNN Score: 0.536
+[❌ FAIL] Clip: clip_36 | Triggered: False | Max CNN Score: 0.173
+
+==================================================
+🏁 BENCHMARK COMPLETE
+==================================================
+
+we removed the tflite optimization and then retrained the custom cnn
+
+python train_custom_cnn.py    
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🧠 TRAINING CUSTOM CNN V2 (BATCH NORMALIZED)
+==================================================
+Loading dataset...
+Found 613 files belonging to 2 classes.
+Using 491 files for training.
+Found 613 files belonging to 2 classes.
+Using 122 files for validation.
+
+🚀 Starting Training...
+Epoch 1/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 9s 204ms/step - accuracy: 0.5771 - loss: 0.8200 - val_accuracy: 0.5164 - val_loss: 0.6793
+Epoch 2/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 121ms/step - accuracy: 0.7057 - loss: 0.5486 - val_accuracy: 0.5164 - val_loss: 0.6817
+Epoch 3/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 118ms/step - accuracy: 0.7416 - loss: 0.5446 - val_accuracy: 0.6230 - val_loss: 0.6613
+Epoch 4/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 115ms/step - accuracy: 0.7854 - loss: 0.4876 - val_accuracy: 0.6311 - val_loss: 0.6671
+Epoch 5/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 116ms/step - accuracy: 0.7970 - loss: 0.4390 - val_accuracy: 0.6066 - val_loss: 0.6674
+Epoch 6/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 114ms/step - accuracy: 0.8245 - loss: 0.3962 - val_accuracy: 0.5656 - val_loss: 0.6804
+Epoch 7/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 115ms/step - accuracy: 0.8208 - loss: 0.4013 - val_accuracy: 0.6148 - val_loss: 0.6782
+Epoch 8/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 115ms/step - accuracy: 0.8329 - loss: 0.3917 - val_accuracy: 0.5984 - val_loss: 0.6825
+Epoch 9/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 116ms/step - accuracy: 0.8234 - loss: 0.3832 - val_accuracy: 0.6803 - val_loss: 0.6295
+Epoch 10/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 117ms/step - accuracy: 0.8081 - loss: 0.4260 - val_accuracy: 0.6230 - val_loss: 0.6532
+Epoch 11/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 120ms/step - accuracy: 0.8787 - loss: 0.3234 - val_accuracy: 0.6230 - val_loss: 0.6762
+Epoch 12/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 121ms/step - accuracy: 0.8569 - loss: 0.3526 - val_accuracy: 0.6230 - val_loss: 0.6908
+Epoch 13/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 128ms/step - accuracy: 0.8704 - loss: 0.3144 - val_accuracy: 0.6393 - val_loss: 0.6799
+Epoch 14/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 114ms/step - accuracy: 0.8505 - loss: 0.3436 - val_accuracy: 0.6230 - val_loss: 0.7585
+Epoch 15/15
+16/16 ━━━━━━━━━━━━━━━━━━━━ 2s 117ms/step - accuracy: 0.8910 - loss: 0.2998 - val_accuracy: 0.6721 - val_loss: 0.6767
+
+==================================================
+📦 EXPORTING PURE FLOAT32 TFLITE MODEL...
+==================================================
+Saved artifact at '/var/folders/vm/s5xwrxd93_xbnhp70qvyw03w0000gq/T/tmpeq30iab9'. The following endpoints are available:
+
+* Endpoint 'serve'
+  args_0 (POSITIONAL_ONLY): TensorSpec(shape=(None, 160, 160, 1), dtype=tf.float32, name='keras_tensor')
+Output Type:
+  TensorSpec(shape=(None, 1), dtype=tf.float32, name=None)
+Captures:
+  5849468592: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849467536: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849496032: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849497088: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849494976: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849495856: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849531488: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849531312: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849555184: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849555360: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849533072: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849533600: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849556944: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849556768: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849575840: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849576896: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849558704: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849575664: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849578832: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849578480: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849593632: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849594688: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849592752: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849593456: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849595744: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  5849604336: TensorSpec(shape=(), dtype=tf.resource, name=None)
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1775562451.669633 4169949 tf_tfl_flatbuffer_helpers.cc:364] Ignored output_format.
+W0000 00:00:1775562451.669664 4169949 tf_tfl_flatbuffer_helpers.cc:367] Ignored drop_control_dependency.
+I0000 00:00:1775562451.676897 4169949 mlir_graph_optimization_pass.cc:437] MLIR V1 optimization pass is not enabled
+✅ Success! V2 Edge model saved as: custom_handshake_cnn.tflite
+File Size: 6.34 MB
+
+benchmarking result:
+
+python benchmark_custom_cnn.py
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+==================================================
+🚀 INITIALIZING HYBRID GATED PIPELINE (IEEE FINAL)
+==================================================
+I0000 00:00:1775562827.001536 4176241 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1775562827.016757 4176246 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1775562827.031465 4176247 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+/Users/nagashayanaramamurthy/GitHub/rp-help-tools/update_model/.venv/lib/python3.9/site-packages/tensorflow/lite/python/interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+Evaluating Category: NONE
+W0000 00:00:1775562827.106302 4176248 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[❌ FAIL] Clip: clip_28 | Triggered: True | Max CNN Score: 0.915
+[❌ FAIL] Clip: clip_29 | Triggered: True | Max CNN Score: 0.751
+[✅ CORRECT] Clip: clip_33 | Triggered: False | Max CNN Score: 0.203
+[✅ CORRECT] Clip: clip_35 | Triggered: False | Max CNN Score: 0.000
+[✅ CORRECT] Clip: clip_32 | Triggered: False | Max CNN Score: 0.268
+[❌ FAIL] Clip: clip_23 | Triggered: True | Max CNN Score: 0.782
+[❌ FAIL] Clip: clip_39 | Triggered: True | Max CNN Score: 0.633
+
+Evaluating Category: HANDSHAKE
+[✅ CORRECT] Clip: clip_10 | Triggered: True | Max CNN Score: 0.847
+[✅ CORRECT] Clip: clip_28 | Triggered: True | Max CNN Score: 0.682
+[✅ CORRECT] Clip: clip_17 | Triggered: True | Max CNN Score: 0.908
+[✅ CORRECT] Clip: clip_19 | Triggered: True | Max CNN Score: 0.788
+[✅ CORRECT] Clip: clip_26 | Triggered: True | Max CNN Score: 0.667
+[✅ CORRECT] Clip: clip_18 | Triggered: True | Max CNN Score: 0.811
+[✅ CORRECT] Clip: clip_27 | Triggered: True | Max CNN Score: 0.821
+[✅ CORRECT] Clip: clip_20 | Triggered: True | Max CNN Score: 0.865
+[✅ CORRECT] Clip: clip_29 | Triggered: True | Max CNN Score: 0.840
+[✅ CORRECT] Clip: clip_16 | Triggered: True | Max CNN Score: 0.955
+[✅ CORRECT] Clip: clip_4 | Triggered: True | Max CNN Score: 0.917
+[✅ CORRECT] Clip: clip_3 | Triggered: True | Max CNN Score: 0.886
+[✅ CORRECT] Clip: clip_2 | Triggered: True | Max CNN Score: 0.920
+[✅ CORRECT] Clip: clip_5 | Triggered: True | Max CNN Score: 0.899
+[✅ CORRECT] Clip: clip_33 | Triggered: True | Max CNN Score: 0.688
+[✅ CORRECT] Clip: clip_34 | Triggered: True | Max CNN Score: 0.797
+[✅ CORRECT] Clip: clip_35 | Triggered: True | Max CNN Score: 0.834
+[❌ FAIL] Clip: clip_32 | Triggered: False | Max CNN Score: 0.352
+[✅ CORRECT] Clip: clip_14 | Triggered: True | Max CNN Score: 0.925
+[❌ FAIL] Clip: clip_13 | Triggered: False | Max CNN Score: 0.000
+[❌ FAIL] Clip: clip_23 | Triggered: False | Max CNN Score: 0.112
+[✅ CORRECT] Clip: clip_24 | Triggered: True | Max CNN Score: 0.627
+[✅ CORRECT] Clip: clip_15 | Triggered: True | Max CNN Score: 0.911
+[❌ FAIL] Clip: clip_41 | Triggered: False | Max CNN Score: 0.000
+[✅ CORRECT] Clip: clip_9 | Triggered: True | Max CNN Score: 0.851
+[✅ CORRECT] Clip: clip_0 | Triggered: True | Max CNN Score: 0.850
+[✅ CORRECT] Clip: clip_7 | Triggered: True | Max CNN Score: 0.892
+[✅ CORRECT] Clip: clip_6 | Triggered: True | Max CNN Score: 0.925
+[✅ CORRECT] Clip: clip_1 | Triggered: True | Max CNN Score: 0.870
+[✅ CORRECT] Clip: clip_8 | Triggered: True | Max CNN Score: 0.883
+[❌ FAIL] Clip: clip_37 | Triggered: False | Max CNN Score: 0.391
+[✅ CORRECT] Clip: clip_30 | Triggered: True | Max CNN Score: 0.766
+[✅ CORRECT] Clip: clip_31 | Triggered: True | Max CNN Score: 0.865
+[✅ CORRECT] Clip: clip_36 | Triggered: True | Max CNN Score: 0.762
+
+==================================================
+🏁 BENCHMARK COMPLETE
+==================================================
+
+we see now, it is not just printing 0.536 as cnn score as previous result, looks more natural
+
+analysis:
+- bumping threshold of CNN to 0.80 will reduce 4 false positives but will also reduce 1 true positive
+- currentlly the recall is 85%
+
+
+lets try on adversarial dataset, then we can combine both adversarial and standard to see final recall rate
+
+[❌ FAIL] Clip: clip_21 | Triggered: True | Max CNN Score: 0.725
+[❌ FAIL] Clip: clip_26 | Triggered: True | Max CNN Score: 0.858
+[❌ FAIL] Clip: clip_27 | Triggered: True | Max CNN Score: 0.866
+[✅ CORRECT] Clip: clip_34 | Triggered: False | Max CNN Score: 0.000
+[❌ FAIL] Clip: clip_25 | Triggered: True | Max CNN Score: 0.812
+[❌ FAIL] Clip: clip_22 | Triggered: True | Max CNN Score: 0.664
+[✅ CORRECT] Clip: clip_40 | Triggered: False | Max CNN Score: 0.593
+[❌ FAIL] Clip: clip_24 | Triggered: True | Max CNN Score: 0.655
+[❌ FAIL] Clip: clip_37 | Triggered: True | Max CNN Score: 0.696
+[❌ FAIL] Clip: clip_30 | Triggered: True | Max CNN Score: 0.739
+[❌ FAIL] Clip: clip_38 | Triggered: True | Max CNN Score: 0.624
+[✅ CORRECT] Clip: clip_31 | Triggered: False | Max CNN Score: 0.214
+[❌ FAIL] Clip: clip_36 | Triggered: True | Max CNN Score: 0.801
+
+Evaluating Category: HANDSHAKE
+[❌ FAIL] Clip: clip_21 | Triggered: False | Max CNN Score: 0.081
+[✅ CORRECT] Clip: clip_11 | Triggered: True | Max CNN Score: 0.906
+[❌ FAIL] Clip: clip_25 | Triggered: False | Max CNN Score: 0.000
+[❌ FAIL] Clip: clip_22 | Triggered: False | Max CNN Score: 0.276
+[❌ FAIL] Clip: clip_40 | Triggered: False | Max CNN Score: 0.000
+[✅ CORRECT] Clip: clip_12 | Triggered: True | Max CNN Score: 0.924
+[❌ FAIL] Clip: clip_39 | Triggered: False | Max CNN Score: 0.146
+[❌ FAIL] Clip: clip_38 | Triggered: False | Max CNN Score: 0.342
+
+==================================================
+🏁 BENCHMARK COMPLETE
+==================================================
+
+let me train in on train_dataset_v2 instead of train_dataset_v2/unbiased because I see when we try to block the faces it is also blocking the hands/fingers sometimes like in salute

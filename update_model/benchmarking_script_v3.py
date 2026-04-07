@@ -214,8 +214,8 @@ for category in categories:
                     clip_min_tilt = min(clip_min_tilt, palm_tilt)
                     clip_max_tilt = max(clip_max_tilt, palm_tilt)
                     if temp_open: clip_thumb_open = True
-                    
-                    if temp_reaching and temp_open and temp_vertical:
+                    is_low_enough = wrist_y > 0.38  # 0.0 is top of screen, 1.0 is bottom
+                    if temp_reaching and temp_open and temp_vertical and is_low_enough:
                         target_landmarks = landmarks
                         is_reaching, is_open, is_vertical = True, True, True
                         pose_score = 1.0
