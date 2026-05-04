@@ -4133,3 +4133,105 @@ Total Frames Processed : 5120
 Avg Latency per Frame  : 22.44 ms
 Estimated Real-Time FPS: 44.6 FPS
 
+after reducing confidence to 50%
+
+ython benchmark_custom_cnn.py
+==================================================
+🚀 BENCHMARKING HYBRID GATED PIPELINE (IEEE FINAL)
+==================================================
+I0000 00:00:1777898903.928089 14201235 init-domain.cc:128] Fiber init: default domain = pthread, concurrency = 8, prefix = pthread-default
+I0000 00:00:1777898904.125255 14201235 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1777898904.134183 14201242 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1777898904.150048 14201240 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+Evaluating Category: NONE
+W0000 00:00:1777898904.221225 14201240 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.09
+[✅ CORRECT - TN] Clip: clip_21 | Score: 0.18
+[✅ CORRECT - TN] Clip: clip_26 | Score: 0.09
+[✅ CORRECT - TN] Clip: clip_27 | Score: 0.09
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.07
+[✅ CORRECT - TN] Clip: clip_33 | Score: 0.18
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_32 | Score: 0.19
+[✅ CORRECT - TN] Clip: clip_25 | Score: 0.08
+[✅ CORRECT - TN] Clip: clip_22 | Score: 0.22
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.27
+[✅ CORRECT - TN] Clip: clip_23 | Score: 0.18
+[✅ CORRECT - TN] Clip: clip_24 | Score: 0.18
+[✅ CORRECT - TN] Clip: clip_37 | Score: 0.40
+[✅ CORRECT - TN] Clip: clip_30 | Score: 0.37
+[✅ CORRECT - TN] Clip: clip_39 | Score: 0.25
+[✅ CORRECT - TN] Clip: clip_38 | Score: 0.49
+[✅ CORRECT - TN] Clip: clip_31 | Score: 0.18
+[✅ CORRECT - TN] Clip: clip_36 | Score: 0.41
+
+Evaluating Category: HANDSHAKE
+[✅ CORRECT - TP] Clip: clip_10 | Score: 0.53
+[❌ FAIL - FN] Clip: clip_28 | Score: 0.43
+[❌ FAIL - FN] Clip: clip_17 | Score: 0.50
+[❌ FAIL - FN] Clip: clip_21 | Score: 0.07
+[✅ CORRECT - TP] Clip: clip_19 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.62
+[✅ CORRECT - TP] Clip: clip_18 | Score: 0.56
+[✅ CORRECT - TP] Clip: clip_27 | Score: 0.61
+[✅ CORRECT - TP] Clip: clip_20 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_29 | Score: 0.59
+[✅ CORRECT - TP] Clip: clip_16 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_11 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_4 | Score: 0.70
+[✅ CORRECT - TP] Clip: clip_3 | Score: 0.53
+[✅ CORRECT - TP] Clip: clip_2 | Score: 0.53
+[✅ CORRECT - TP] Clip: clip_5 | Score: 0.55
+[❌ FAIL - FN] Clip: clip_33 | Score: 0.43
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.50
+[❌ FAIL - FN] Clip: clip_35 | Score: 0.41
+[❌ FAIL - FN] Clip: clip_32 | Score: 0.21
+[✅ CORRECT - TP] Clip: clip_14 | Score: 0.53
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.24
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_23 | Score: 0.25
+[❌ FAIL - FN] Clip: clip_24 | Score: 0.38
+[✅ CORRECT - TP] Clip: clip_12 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_15 | Score: 0.51
+E0000 00:00:1777899024.081918 14201236 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-05-04T09:04:24.073532-04:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_9 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_0 | Score: 0.57
+[✅ CORRECT - TP] Clip: clip_7 | Score: 0.66
+[✅ CORRECT - TP] Clip: clip_6 | Score: 0.67
+[✅ CORRECT - TP] Clip: clip_1 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_8 | Score: 0.52
+[❌ FAIL - FN] Clip: clip_37 | Score: 0.24
+[❌ FAIL - FN] Clip: clip_30 | Score: 0.39
+[❌ FAIL - FN] Clip: clip_39 | Score: 0.06
+[❌ FAIL - FN] Clip: clip_38 | Score: 0.19
+[❌ FAIL - FN] Clip: clip_31 | Score: 0.44
+[❌ FAIL - FN] Clip: clip_36 | Score: 0.47
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  69.35%
+Precision: 100.00%
+Recall:    54.76%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 4255
+Avg Latency per Frame  : 21.75 ms
+Estimated Real-Time FPS: 46.0 FPS
+
+Two approaches to solve the overfitting problem:
+- Synthetic data generation using controlnet
+- Crop the image for hand only and pass only that info to CNN.
+
+I will try 2nd technique to see how it behaves and if it could solve this overfitting problem.
