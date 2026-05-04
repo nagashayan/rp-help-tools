@@ -7,3 +7,7 @@ matplotlib
 tox
 optree # To use Keras, you need to have `optree` installed
 rich
+mtcnn
+xgboost
+libomp
+ai-edge-litert

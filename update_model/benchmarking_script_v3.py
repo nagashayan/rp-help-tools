@@ -103,7 +103,7 @@ def preprocess_input_edge(x):
 # ==========================================
 # Benchmark Setup
 # ==========================================
-BENCHMARK_DIR = "../images/p1_dataset_adversaries"  
+BENCHMARK_DIR = "../images/p1_dataset_combined"  
 if not os.path.exists(BENCHMARK_DIR):
     print(f"ERROR: Please create the folder structure '{BENCHMARK_DIR}/handshake' and '{BENCHMARK_DIR}/none'.")
     exit()
@@ -114,7 +114,7 @@ total_sbf_ms = 0.0
 total_cnn_ms = 0.0
 valid_frame_count = 0
 global_frame_tracker = 0
-WARMUP_FRAMES = 5 
+WARMUP_FRAMES = 5
 
 true_positives = 0
 false_positives = 0

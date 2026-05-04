@@ -19,7 +19,7 @@ base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
 options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=3)
 detector = vision.HandLandmarker.create_from_options(options)
 
-BENCHMARK_DIR = "../images/p1_dataset_adversaries"
+BENCHMARK_DIR = "../images/p1_dataset_combined"  # This should contain the combined dataset with both handshake and none categories
 categories = ["none", "handshake"]
 
 X = [] # This will hold our 4 features: [Reach, Tilt, Thumb_Dist, Wrist_Y]

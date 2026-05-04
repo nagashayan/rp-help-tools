@@ -96,7 +96,7 @@ def preprocess_input_edge(x):
 # ==========================================
 # Benchmark Setup
 # ==========================================
-BENCHMARK_DIR = "../images/p1_dataset"
+BENCHMARK_DIR = "../images/p1_dataset_combined"
 if not os.path.exists(BENCHMARK_DIR):
     print(f"ERROR: Please create the folder structure '{BENCHMARK_DIR}/handshake' and '{BENCHMARK_DIR}/none'.")
     exit()

@@ -6,7 +6,7 @@ print("==================================================")
 print("🧠 TRAINING CUSTOM CNN V2 (BATCH NORMALIZED)")
 print("==================================================")
 
-DATASET_DIR = "../images/train_dataset_v2" 
+DATASET_DIR = "../images/train_dataset_v2_gray"  # <-- Make sure to point to the GRAYSCALE dataset!
 IMG_SIZE = (160, 160)
 BATCH_SIZE = 32
 EPOCHS = 15
