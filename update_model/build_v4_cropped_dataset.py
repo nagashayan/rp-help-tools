@@ -1,17 +1,18 @@
 import os
 import cv2
 import glob
+import math
 import numpy as np
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 print("==================================================")
-print("✂️ GENERATING MACRO-TO-MICRO CROPPED DATASET")
+print("✂️ GENERATING HARD-NEGATIVE CROPPED DATASET (BENCHMARK PARITY)")
 print("==================================================")
 
 # --- CONFIGURATION ---
-INPUT_DATASET_DIR = "../images/train_dataset_v2"  # Ensure this is your original color dataset!
+INPUT_DATASET_DIR = "../images/train_dataset_v2" # Your original color images
 OUTPUT_DATASET_DIR = "../images/train_dataset_v3_cropped"
 CATEGORIES = ["none", "handshake"]
 
@@ -19,18 +20,46 @@ CATEGORIES = ["none", "handshake"]
 base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
 options = vision.HandLandmarkerOptions(
     base_options=base_options,
-    num_hands=4,  # Allow multiple hands so we can filter for the reaching one
+    num_hands=4,  
     min_hand_detection_confidence=0.5
 )
 detector = vision.HandLandmarker.create_from_options(options)
 
-# Create output directories
 for category in CATEGORIES:
     os.makedirs(os.path.join(OUTPUT_DATASET_DIR, category), exist_ok=True)
 
 processed_count = 0
 skipped_count = 0
 
+# --- EXACT BENCHMARK LOGIC RANKING ---
+def calculate_handshake_score(lms):
+    """
+    Ranks a hand using the EXACT formulas from benchmark_custom_cnn.py
+    """
+    score = 0.0
+    
+    # 1. REACH (Wrist Z - Middle Finger Tip Z)
+    reach = lms[0].z - lms[12].z
+    # Multiply by 1000 to scale the small float into a meaningful point value
+    score += (reach * 1000) 
+    
+    # 2. TILT (Mid-Prone Check)
+    dx = lms[5].x - lms[17].x
+    dy = lms[5].y - lms[17].y
+    tilt = abs(math.degrees(math.atan2(dy, dx)))
+    
+    # If it falls within your benchmark's valid tilt range (15 to 165)
+    if 15 < tilt < 165:
+        score += 50.0  # Massive bonus for having the correct palm angle
+        
+    # 3. THUMB DISTANCE (Thumb Tip to Index Tip)
+    thumb_dist = math.hypot(lms[4].x - lms[8].x, lms[4].y - lms[8].y)
+    # Scale distance to points (wider thumb = higher score)
+    score += (thumb_dist * 100) 
+        
+    return score
+
+# --- MAIN PROCESSING LOOP ---
 for category in CATEGORIES:
     print(f"\nProcessing category: {category}...")
     
@@ -44,7 +73,6 @@ for category in CATEGORIES:
             
         img_h, img_w, _ = frame.shape
         
-        # 2. Process with Tasks API
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
         results = detector.detect(mp_image)
@@ -53,30 +81,26 @@ for category in CATEGORIES:
             skipped_count += 1
             continue
             
-        # --- 3. TRAINING-INFERENCE PARITY (Z-Index / Reach Logic) ---
+        # --- FIND THE HIGHEST RANKING HAND ---
         best_lms = None
-        min_z = float('inf') 
+        highest_score = -float('inf')
         
         for hand_landmarks in results.hand_landmarks:
-            # Calculate a Z-based "reach" score (lower Z generally means closer to camera)
-            # Replace this with your EXACT math from benchmark_hybrid.py!
-            avg_z = sum([lm.z for lm in hand_landmarks]) / len(hand_landmarks)
-            hand_reach_score = avg_z 
+            hand_score = calculate_handshake_score(hand_landmarks)
             
-            if hand_reach_score < min_z:
-                min_z = hand_reach_score
+            if hand_score > highest_score:
+                highest_score = hand_score
                 best_lms = hand_landmarks
                 
         lms = best_lms
         
-        # 4. Get standard hand bounding box coordinates in pixels
+        # --- DYNAMIC PROPORTIONAL PADDING ---
         x_coords = [int(lm.x * img_w) for lm in lms]
         y_coords = [int(lm.y * img_h) for lm in lms]
         
         x_min, x_max = min(x_coords), max(x_coords)
         y_min, y_max = min(y_coords), max(y_coords)
         
-        # --- 5. DYNAMIC PROPORTIONAL PADDING ---
         box_w = x_max - x_min
         box_h = y_max - y_min
         
@@ -93,13 +117,12 @@ for category in CATEGORIES:
         arm_dx = wrist_x - mid_x
         arm_dy = wrist_y - mid_y
         
-        # Dynamically stretch the box toward the arm direction using the proportional padding
+        # Stretch box dynamically
         x_min_adj = max(0, x_min - (pad_arm_x if arm_dx < 0 else pad_fingers_x))
         x_max_adj = min(img_w, x_max + (pad_arm_x if arm_dx > 0 else pad_fingers_x))
         y_min_adj = max(0, y_min - (pad_arm_y if arm_dy < 0 else pad_fingers_y))
         y_max_adj = min(img_h, y_max + (pad_arm_y if arm_dy > 0 else pad_fingers_y))
         
-        # 6. Crop and Resize
         hand_arm_crop = frame[y_min_adj:y_max_adj, x_min_adj:x_max_adj]
         
         if hand_arm_crop.size == 0:
@@ -108,14 +131,13 @@ for category in CATEGORIES:
             
         crop_resized = cv2.resize(hand_arm_crop, (160, 160))
         
-        # Save output
         filename = os.path.basename(img_path)
         save_path = os.path.join(OUTPUT_DATASET_DIR, category, filename)
         cv2.imwrite(save_path, crop_resized)
         processed_count += 1
 
 print("\n" + "="*50)
-print(f"✅ Cropping Complete!")
+print(f"✅ Hard-Negative Cropping Complete!")
 print(f"Images Successfully Cropped: {processed_count}")
-print(f"Images Skipped (No Hand Detected): {skipped_count}")
+print(f"Images Skipped: {skipped_count}")
 print("="*50)

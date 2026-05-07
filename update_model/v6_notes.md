@@ -4478,3 +4478,506 @@ also another idea gemini suggested is ranking the hands in the frame according t
 
 Gemini: it is a trap! Remember the "Waste of Brain Space" rule we just talked about:
 If you take a hand resting on a leg (the lowest score) and put it in the none folder, you are spending CNN neurons teaching it to recognize a resting hand. But in your live robot, Stage 1 (MediaPipe) will never pass a resting hand to the CNN anyway.
+
+🧠 TRAINING CNN: FULL FRAMES + HEAVY AUGMENTATION
+==================================================
+Loading dataset...
+Found 436 files belonging to 2 classes.
+Using 349 files for training.
+Found 436 files belonging to 2 classes.
+Using 87 files for validation.
+
+🚀 Starting Training...
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 3s 160ms/step - accuracy: 0.5673 - loss: 0.8337 - val_accuracy: 0.5172 - val_loss: 0.7045
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 152ms/step - accuracy: 0.7106 - loss: 0.5474 - val_accuracy: 0.5057 - val_loss: 0.6971
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 146ms/step - accuracy: 0.7851 - loss: 0.4613 - val_accuracy: 0.5057 - val_loss: 0.6985
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.7937 - loss: 0.4669 - val_accuracy: 0.5172 - val_loss: 0.7141
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 155ms/step - accuracy: 0.8309 - loss: 0.4070 - val_accuracy: 0.5517 - val_loss: 0.6726
+Epoch 6/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.8281 - loss: 0.3960 - val_accuracy: 0.5172 - val_loss: 0.7050
+Epoch 7/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.8682 - loss: 0.3199 - val_accuracy: 0.5057 - val_loss: 0.7367
+Epoch 8/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 147ms/step - accuracy: 0.8567 - loss: 0.3306 - val_accuracy: 0.5172 - val_loss: 0.7178
+Epoch 9/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 147ms/step - accuracy: 0.8825 - loss: 0.3019 - val_accuracy: 0.5172 - val_loss: 0.7310
+Epoch 10/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 146ms/step - accuracy: 0.9140 - loss: 0.2742 - val_accuracy: 0.5172 - val_loss: 0.7605
+Epoch 11/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 145ms/step - accuracy: 0.9226 - loss: 0.2321 - val_accuracy: 0.5402 - val_loss: 0.7074
+Epoch 12/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 147ms/step - accuracy: 0.9226 - loss: 0.2289 - val_accuracy: 0.5172 - val_loss: 0.7153
+Epoch 13/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.9427 - loss: 0.2010 - val_accuracy: 0.5287 - val_loss: 0.7287
+Epoch 14/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 146ms/step - accuracy: 0.9255 - loss: 0.1978 - val_accuracy: 0.5517 - val_loss: 0.7049
+Epoch 15/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 149ms/step - accuracy: 0.9284 - loss: 0.2145 - val_accuracy: 0.5172 - val_loss: 0.7657
+
+==================================================
+📦 EXPORTING PURE FLOAT32 TFLITE MODEL...
+
+The model val_accuracy was not improving more than 51% at all, so we decided to try mobilenetv2 again
+
+python cnn_model_trainer.py
+Found 350 images belonging to 2 classes.
+Found 86 images belonging to 2 classes.
+
+--- Starting Phase 1: Feature Extraction ---
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 5s 322ms/step - accuracy: 0.5543 - loss: 0.8025 - val_accuracy: 0.6163 - val_loss: 0.6475
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 188ms/step - accuracy: 0.6429 - loss: 0.6664 - val_accuracy: 0.6395 - val_loss: 0.6497
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 185ms/step - accuracy: 0.6143 - loss: 0.6931 - val_accuracy: 0.6047 - val_loss: 0.6584
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 186ms/step - accuracy: 0.6800 - loss: 0.6157 - val_accuracy: 0.5930 - val_loss: 0.6945
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 4s 363ms/step - accuracy: 0.7143 - loss: 0.5573 - val_accuracy: 0.5930 - val_loss: 0.7736
+Epoch 6/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 196ms/step - accuracy: 0.7600 - loss: 0.5128 - val_accuracy: 0.5581 - val_loss: 0.7872
+
+--- Starting Phase 2: Fine-Tuning ---
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 6s 262ms/step - accuracy: 0.5057 - loss: 0.7745 - val_accuracy: 0.6512 - val_loss: 0.6539
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 193ms/step - accuracy: 0.6486 - loss: 0.6773 - val_accuracy: 0.5000 - val_loss: 0.6748
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 194ms/step - accuracy: 0.5886 - loss: 0.6850 - val_accuracy: 0.5233 - val_loss: 0.7297
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 199ms/step - accuracy: 0.6600 - loss: 0.6169 - val_accuracy: 0.5116 - val_loss: 0.7407
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 192ms/step - accuracy: 0.6086 - loss: 0.6624 - val_accuracy: 0.4767 - val_loss: 0.7138
+Epoch 6/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 191ms/step - accuracy: 0.6571 - loss: 0.6381 - val_accuracy: 0.5698 - val_loss: 0.7003
+Epoch 7/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 198ms/step - accuracy: 0.6771 - loss: 0.6021 - val_accuracy: 0.5698 - val_loss: 0.7012
+Epoch 8/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 196ms/step - accuracy: 0.6629 - loss: 0.6470 - val_accuracy: 0.6047 - val_loss: 0.7018
+Epoch 9/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 193ms/step - accuracy: 0.7143 - loss: 0.5933 - val_accuracy: 0.5000 - val_loss: 0.7610
+Epoch 10/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 192ms/step - accuracy: 0.6914 - loss: 0.5690 - val_accuracy: 0.5581 - val_loss: 0.6644
+Epoch 11/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 206ms/step - accuracy: 0.7057 - loss: 0.5792 - val_accuracy: 0.5698 - val_loss: 0.6676
+Epoch 12/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 210ms/step - accuracy: 0.7486 - loss: 0.5470 - val_accuracy: 0.5116 - val_loss: 0.7463
+Epoch 13/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 194ms/step - accuracy: 0.7514 - loss: 0.5148 - val_accuracy: 0.6047 - val_loss: 0.7004
+Epoch 14/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 205ms/step - accuracy: 0.7514 - loss: 0.5169 - val_accuracy: 0.5233 - val_loss: 0.7299
+Epoch 15/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 199ms/step - accuracy: 0.7371 - loss: 0.5405 - val_accuracy: 0.5349 - val_loss: 0.7251
+Model training complete and saved as handshake_model.keras!
+Saved learning_curves.png
+
+--- Running Final Evaluation ---
+Found 436 images belonging to 2 classes.
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 142ms/step
+Precision:   0.8182
+Recall:      0.6711
+F1-Score:    0.7373
+Specificity: 0.8365
+Saved confusion_matrix.png
+
+The above training plan included less data augmentation and no gaussian blur, still validation accuracy didn't improve
+so we decided to try mobilenetv2
+
+this helped a bit
+
+python cnn_model_trainer.py
+
+==================================================
+🧠 PHASE 3: MOBILENET-V2 (HARD-NEGATIVE CROPS)
+==================================================
+Found 350 images belonging to 2 classes.
+Found 86 images belonging to 2 classes.
+
+--- Phase 1: Feature Extraction ---
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 5s 280ms/step - accuracy: 0.6343 - loss: 0.7327 - val_accuracy: 0.6395 - val_loss: 0.6496
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 173ms/step - accuracy: 0.7543 - loss: 0.4899 - val_accuracy: 0.5930 - val_loss: 0.6973
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 170ms/step - accuracy: 0.8229 - loss: 0.3925 - val_accuracy: 0.6279 - val_loss: 0.7119
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 171ms/step - accuracy: 0.8514 - loss: 0.3927 - val_accuracy: 0.6047 - val_loss: 0.7581
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 182ms/step - accuracy: 0.8600 - loss: 0.3339 - val_accuracy: 0.6163 - val_loss: 0.7451
+
+--- Phase 2: Fine-Tuning ---
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 6s 276ms/step - accuracy: 0.7257 - loss: 0.5553 - val_accuracy: 0.6512 - val_loss: 0.6440
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 190ms/step - accuracy: 0.8400 - loss: 0.3893 - val_accuracy: 0.6860 - val_loss: 0.6539
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 192ms/step - accuracy: 0.8600 - loss: 0.3254 - val_accuracy: 0.6977 - val_loss: 0.6787
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 195ms/step - accuracy: 0.9200 - loss: 0.2499 - val_accuracy: 0.6628 - val_loss: 0.7344
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 195ms/step - accuracy: 0.9229 - loss: 0.1931 - val_accuracy: 0.6512 - val_loss: 0.7424
+
+✅ Saved Keras model: handshake_model.keras
+
+--- Running Final Evaluation ---
+Found 86 images belonging to 2 classes.
+3/3 ━━━━━━━━━━━━━━━━━━━━ 1s 305ms/step
+Precision:   0.6970
+Recall:      0.5111
+F1-Score:    0.5897
+Specificity: 0.7561
+
+📦 EXPORTING TO TFLITE...
+WARNING:absl:Please consider providing the trackable_obj argument in the from_concrete_functions. Providing without the trackable_obj argument is deprecated and it will use the deprecated conversion path.
+2026-05-07 08:34:17.468786: I tensorflow/core/grappler/devices.cc:75] Number of eligible GPUs (core count >= 8, compute capability >= 0.0): 0 (Note: TensorFlow was not compiled with CUDA or ROCm support)
+2026-05-07 08:34:17.468898: I tensorflow/core/grappler/clusters/single_machine.cc:361] Starting new session
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1778157258.046105 15064165 tf_tfl_flatbuffer_helpers.cc:390] Ignored output_format.
+W0000 00:00:1778157258.046427 15064165 tf_tfl_flatbuffer_helpers.cc:393] Ignored drop_control_dependency.
+2026-05-07 08:34:18.374570: I tensorflow/compiler/mlir/lite/flatbuffer_export.cc:3064] Estimated count of arithmetic ops: 309.452 M  ops, equivalently 154.726 M  MACs
+✅ Success! MobileNet Edge model saved as mobilenet_handshake.tflite
+(.venv_v2) nagashayanaramamurthy@Nagas-MacBook-Pro update_model % 
+ 
+Lets benchmark test it
+
+
+Evaluating Category: NONE
+W0000 00:00:1778157725.904319 15072582 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.37
+[❌ FAIL - FP] Clip: clip_21 | Score: 0.69
+[❌ FAIL - FP] Clip: clip_26 | Score: 0.85
+[❌ FAIL - FP] Clip: clip_27 | Score: 0.73
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.46
+[❌ FAIL - FP] Clip: clip_33 | Score: 0.77
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_32 | Score: 0.89
+[❌ FAIL - FP] Clip: clip_25 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_22 | Score: 0.74
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.47
+[❌ FAIL - FP] Clip: clip_23 | Score: 0.73
+[❌ FAIL - FP] Clip: clip_24 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_37 | Score: 0.82
+[❌ FAIL - FP] Clip: clip_30 | Score: 0.60
+[❌ FAIL - FP] Clip: clip_39 | Score: 0.54
+[❌ FAIL - FP] Clip: clip_38 | Score: 0.53
+[❌ FAIL - FP] Clip: clip_31 | Score: 0.58
+[❌ FAIL - FP] Clip: clip_36 | Score: 0.62
+
+Evaluating Category: HANDSHAKE
+[✅ CORRECT - TP] Clip: clip_10 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_28 | Score: 0.73
+[✅ CORRECT - TP] Clip: clip_17 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_21 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_19 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.86
+[✅ CORRECT - TP] Clip: clip_18 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_27 | Score: 0.54
+[✅ CORRECT - TP] Clip: clip_20 | Score: 0.97
+[❌ FAIL - FN] Clip: clip_29 | Score: 0.46
+[✅ CORRECT - TP] Clip: clip_16 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_11 | Score: 0.58
+[✅ CORRECT - TP] Clip: clip_4 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_3 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_2 | Score: 0.58
+[✅ CORRECT - TP] Clip: clip_5 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_33 | Score: 0.53
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.92
+[✅ CORRECT - TP] Clip: clip_35 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_32 | Score: 0.66
+[✅ CORRECT - TP] Clip: clip_14 | Score: 0.56
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.39
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_23 | Score: 0.50
+[✅ CORRECT - TP] Clip: clip_24 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_12 | Score: 0.85
+[✅ CORRECT - TP] Clip: clip_15 | Score: 0.78
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_9 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_0 | Score: 0.63
+[✅ CORRECT - TP] Clip: clip_7 | Score: 0.56
+[✅ CORRECT - TP] Clip: clip_6 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_1 | Score: 0.56
+[✅ CORRECT - TP] Clip: clip_8 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_37 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_30 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_39 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_38 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_31 | Score: 0.54
+[✅ CORRECT - TP] Clip: clip_36 | Score: 0.50
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  66.13%
+Precision: 70.59%
+Recall:    85.71%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 2874
+Avg Latency per Frame  : 21.71 ms
+Estimated Real-Time FPS: 46.1 FPS
+
+change cnn threshold to 70%
+
+Evaluating Category: NONE
+W0000 00:00:1778158461.705279 15081656 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.37
+[❌ FAIL - FP] Clip: clip_21 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_26 | Score: 0.85
+[❌ FAIL - FP] Clip: clip_27 | Score: 0.73
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.46
+[❌ FAIL - FP] Clip: clip_33 | Score: 0.77
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_32 | Score: 0.89
+[❌ FAIL - FP] Clip: clip_25 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_22 | Score: 0.74
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.47
+[❌ FAIL - FP] Clip: clip_23 | Score: 0.73
+[❌ FAIL - FP] Clip: clip_24 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_37 | Score: 0.82
+[✅ CORRECT - TN] Clip: clip_30 | Score: 0.60
+[✅ CORRECT - TN] Clip: clip_39 | Score: 0.69
+[✅ CORRECT - TN] Clip: clip_38 | Score: 0.65
+[❌ FAIL - FP] Clip: clip_31 | Score: 0.72
+[❌ FAIL - FP] Clip: clip_36 | Score: 0.71
+
+Evaluating Category: HANDSHAKE
+[❌ FAIL - FN] Clip: clip_10 | Score: 0.69
+[✅ CORRECT - TP] Clip: clip_28 | Score: 0.73
+[✅ CORRECT - TP] Clip: clip_17 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_21 | Score: 0.70
+[✅ CORRECT - TP] Clip: clip_19 | Score: 0.75
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.86
+[✅ CORRECT - TP] Clip: clip_18 | Score: 0.76
+[❌ FAIL - FN] Clip: clip_27 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_20 | Score: 0.97
+[❌ FAIL - FN] Clip: clip_29 | Score: 0.46
+[✅ CORRECT - TP] Clip: clip_16 | Score: 0.71
+[✅ CORRECT - TP] Clip: clip_11 | Score: 0.71
+[✅ CORRECT - TP] Clip: clip_4 | Score: 0.71
+[✅ CORRECT - TP] Clip: clip_3 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_2 | Score: 0.72
+[✅ CORRECT - TP] Clip: clip_5 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_33 | Score: 0.80
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.92
+[✅ CORRECT - TP] Clip: clip_35 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_32 | Score: 0.76
+[❌ FAIL - FN] Clip: clip_14 | Score: 0.56
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.39
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_23 | Score: 0.51
+[❌ FAIL - FN] Clip: clip_24 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_12 | Score: 0.85
+[✅ CORRECT - TP] Clip: clip_15 | Score: 0.78
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_9 | Score: 0.83
+[✅ CORRECT - TP] Clip: clip_0 | Score: 0.78
+[✅ CORRECT - TP] Clip: clip_7 | Score: 0.71
+[❌ FAIL - FN] Clip: clip_6 | Score: 0.61
+[✅ CORRECT - TP] Clip: clip_1 | Score: 0.76
+[✅ CORRECT - TP] Clip: clip_8 | Score: 0.76
+[❌ FAIL - FN] Clip: clip_37 | Score: 0.67
+[❌ FAIL - FN] Clip: clip_30 | Score: 0.66
+[❌ FAIL - FN] Clip: clip_39 | Score: 0.68
+[❌ FAIL - FN] Clip: clip_38 | Score: 0.52
+[❌ FAIL - FN] Clip: clip_31 | Score: 0.67
+[❌ FAIL - FN] Clip: clip_36 | Score: 0.67
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  51.61%
+Precision: 66.67%
+Recall:    57.14%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 3810
+Avg Latency per Frame  : 22.62 ms
+Estimated Real-Time FPS: 44.2 FPS
+
+Try cnn threshold with 60%
+
+
+Evaluating Category: NONE
+W0000 00:00:1778167646.948906 15104556 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.37
+[❌ FAIL - FP] Clip: clip_21 | Score: 0.69
+[❌ FAIL - FP] Clip: clip_26 | Score: 0.85
+[❌ FAIL - FP] Clip: clip_27 | Score: 0.73
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.46
+[❌ FAIL - FP] Clip: clip_33 | Score: 0.77
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_32 | Score: 0.89
+[❌ FAIL - FP] Clip: clip_25 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_22 | Score: 0.74
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.47
+[❌ FAIL - FP] Clip: clip_23 | Score: 0.73
+[❌ FAIL - FP] Clip: clip_24 | Score: 0.71
+[❌ FAIL - FP] Clip: clip_37 | Score: 0.82
+[✅ CORRECT - TN] Clip: clip_30 | Score: 0.60
+[❌ FAIL - FP] Clip: clip_39 | Score: 0.69
+[❌ FAIL - FP] Clip: clip_38 | Score: 0.65
+[❌ FAIL - FP] Clip: clip_31 | Score: 0.64
+[❌ FAIL - FP] Clip: clip_36 | Score: 0.62
+
+Evaluating Category: HANDSHAKE
+[✅ CORRECT - TP] Clip: clip_10 | Score: 0.69
+[✅ CORRECT - TP] Clip: clip_28 | Score: 0.73
+[✅ CORRECT - TP] Clip: clip_17 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_21 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_19 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.86
+[✅ CORRECT - TP] Clip: clip_18 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_27 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_20 | Score: 0.97
+[❌ FAIL - FN] Clip: clip_29 | Score: 0.46
+[✅ CORRECT - TP] Clip: clip_16 | Score: 0.71
+[✅ CORRECT - TP] Clip: clip_11 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_4 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_3 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_2 | Score: 0.63
+[✅ CORRECT - TP] Clip: clip_5 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_33 | Score: 0.62
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.92
+[✅ CORRECT - TP] Clip: clip_35 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_32 | Score: 0.66
+[❌ FAIL - FN] Clip: clip_14 | Score: 0.56
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.39
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_23 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_24 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_12 | Score: 0.85
+[✅ CORRECT - TP] Clip: clip_15 | Score: 0.78
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_9 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_0 | Score: 0.63
+[✅ CORRECT - TP] Clip: clip_7 | Score: 0.63
+[✅ CORRECT - TP] Clip: clip_6 | Score: 0.61
+[✅ CORRECT - TP] Clip: clip_1 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_8 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_37 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_30 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_39 | Score: 0.68
+[❌ FAIL - FN] Clip: clip_38 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_31 | Score: 0.67
+[✅ CORRECT - TP] Clip: clip_36 | Score: 0.67
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  62.90%
+Precision: 70.21%
+Recall:    78.57%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 3188
+Avg Latency per Frame  : 22.16 ms
+Estimated Real-Time FPS: 45.1 FPS
+
+Tried palm tilt 20-120 and cnn threshold 0.50
+
+the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.37
+[❌ FAIL - FP] Clip: clip_21 | Score: 0.69
+[✅ CORRECT - TN] Clip: clip_26 | Score: 0.31
+[❌ FAIL - FP] Clip: clip_27 | Score: 0.73
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.46
+[❌ FAIL - FP] Clip: clip_33 | Score: 0.77
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_32 | Score: 0.89
+[❌ FAIL - FP] Clip: clip_25 | Score: 0.60
+[❌ FAIL - FP] Clip: clip_22 | Score: 0.74
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.47
+[✅ CORRECT - TN] Clip: clip_23 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_24 | Score: 0.85
+[❌ FAIL - FP] Clip: clip_37 | Score: 0.82
+[❌ FAIL - FP] Clip: clip_30 | Score: 0.60
+[❌ FAIL - FP] Clip: clip_39 | Score: 0.55
+[❌ FAIL - FP] Clip: clip_38 | Score: 0.53
+[❌ FAIL - FP] Clip: clip_31 | Score: 0.58
+[❌ FAIL - FP] Clip: clip_36 | Score: 0.62
+
+Evaluating Category: HANDSHAKE
+[✅ CORRECT - TP] Clip: clip_10 | Score: 0.53
+[✅ CORRECT - TP] Clip: clip_28 | Score: 0.73
+[✅ CORRECT - TP] Clip: clip_17 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_21 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_19 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.86
+[✅ CORRECT - TP] Clip: clip_18 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_27 | Score: 0.54
+[✅ CORRECT - TP] Clip: clip_20 | Score: 0.97
+[❌ FAIL - FN] Clip: clip_29 | Score: 0.46
+[✅ CORRECT - TP] Clip: clip_16 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_11 | Score: 0.58
+[✅ CORRECT - TP] Clip: clip_4 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_3 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_2 | Score: 0.58
+[✅ CORRECT - TP] Clip: clip_5 | Score: 0.84
+[✅ CORRECT - TP] Clip: clip_33 | Score: 0.53
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.92
+[✅ CORRECT - TP] Clip: clip_35 | Score: 0.82
+[✅ CORRECT - TP] Clip: clip_32 | Score: 0.55
+[✅ CORRECT - TP] Clip: clip_14 | Score: 0.56
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.39
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_23 | Score: 0.50
+[✅ CORRECT - TP] Clip: clip_24 | Score: 0.64
+[✅ CORRECT - TP] Clip: clip_12 | Score: 0.85
+[✅ CORRECT - TP] Clip: clip_15 | Score: 0.78
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[✅ CORRECT - TP] Clip: clip_9 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_0 | Score: 0.63
+[✅ CORRECT - TP] Clip: clip_7 | Score: 0.56
+[✅ CORRECT - TP] Clip: clip_6 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_1 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_8 | Score: 0.60
+[✅ CORRECT - TP] Clip: clip_37 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_30 | Score: 0.65
+[✅ CORRECT - TP] Clip: clip_39 | Score: 0.68
+[✅ CORRECT - TP] Clip: clip_38 | Score: 0.52
+[✅ CORRECT - TP] Clip: clip_31 | Score: 0.54
+[✅ CORRECT - TP] Clip: clip_36 | Score: 0.50
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  69.35%
+Precision: 73.47%
+Recall:    85.71%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 3016
+Avg Latency per Frame  : 21.57 ms
+Estimated Real-Time FPS: 46.4 FPS
+
+change thumbstate to 0.06? this was tanking accuracy but lets try
+
+
+
+is there anything better than mobilenetv2 we should consider? 
