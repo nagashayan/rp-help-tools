@@ -4235,3 +4235,246 @@ Two approaches to solve the overfitting problem:
 - Crop the image for hand only and pass only that info to CNN.
 
 I will try 2nd technique to see how it behaves and if it could solve this overfitting problem.
+
+before that I notice, horizontal flip = true, that flips right and left hands so I removed that and applied heavy data augmentation and the result is underfitting
+
+ python train_custom_cnn.py
+🧠 TRAINING CNN: FULL FRAMES + HEAVY AUGMENTATION
+==================================================
+Loading dataset...
+Found 545 files belonging to 2 classes.
+Using 436 files for training.
+Found 545 files belonging to 2 classes.
+Using 109 files for validation.
+
+🚀 Starting Training...
+Epoch 1/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 7s 223ms/step - accuracy: 0.5711 - loss: 0.8036 - val_accuracy: 0.6239 - val_loss: 0.6512
+Epoch 2/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 150ms/step - accuracy: 0.6261 - loss: 0.6689 - val_accuracy: 0.5505 - val_loss: 0.6737
+Epoch 3/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 155ms/step - accuracy: 0.6124 - loss: 0.6494 - val_accuracy: 0.5413 - val_loss: 0.6760
+Epoch 4/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 149ms/step - accuracy: 0.6491 - loss: 0.6304 - val_accuracy: 0.5413 - val_loss: 0.6816
+Epoch 5/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 149ms/step - accuracy: 0.6376 - loss: 0.6294 - val_accuracy: 0.5413 - val_loss: 0.6853
+Epoch 6/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 153ms/step - accuracy: 0.6628 - loss: 0.6298 - val_accuracy: 0.5413 - val_loss: 0.6835
+Epoch 7/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.6674 - loss: 0.6141 - val_accuracy: 0.5505 - val_loss: 0.6787
+Epoch 8/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 149ms/step - accuracy: 0.6904 - loss: 0.5967 - val_accuracy: 0.5505 - val_loss: 0.6849
+Epoch 9/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 150ms/step - accuracy: 0.6651 - loss: 0.6069 - val_accuracy: 0.5505 - val_loss: 0.6782
+Epoch 10/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 150ms/step - accuracy: 0.6651 - loss: 0.6171 - val_accuracy: 0.5688 - val_loss: 0.6777
+Epoch 11/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 147ms/step - accuracy: 0.7018 - loss: 0.5815 - val_accuracy: 0.5688 - val_loss: 0.6754
+Epoch 12/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 150ms/step - accuracy: 0.7156 - loss: 0.5790 - val_accuracy: 0.6147 - val_loss: 0.6550
+Epoch 13/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 148ms/step - accuracy: 0.6720 - loss: 0.5932 - val_accuracy: 0.5963 - val_loss: 0.6704
+Epoch 14/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 149ms/step - accuracy: 0.6674 - loss: 0.6142 - val_accuracy: 0.6514 - val_loss: 0.6379
+Epoch 15/15
+14/14 ━━━━━━━━━━━━━━━━━━━━ 2s 152ms/step - accuracy: 0.6812 - loss: 0.6046 - val_accuracy: 0.6514 - val_loss: 0.6259
+
+==================================================
+📦 EXPORTING PURE FLOAT32 TFLITE MODEL...
+
+Accurancy tanked
+
+python benchmark_custom_cnn.py 
+==================================================
+🚀 BENCHMARKING HYBRID GATED PIPELINE (IEEE FINAL)
+==================================================
+I0000 00:00:1777934604.515319 14284191 init-domain.cc:128] Fiber init: default domain = pthread, concurrency = 8, prefix = pthread-default
+I0000 00:00:1777934604.671393 14284191 gl_context.cc:407] GL version: 2.1 (2.1 Metal - 90.5), renderer: Apple M1 Pro
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1777934604.680114 14284197 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1777934604.692559 14284202 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+Evaluating Category: NONE
+W0000 00:00:1777934604.755032 14284203 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+[✅ CORRECT - TN] Clip: clip_28 | Score: 0.27
+[✅ CORRECT - TN] Clip: clip_21 | Score: 0.38
+[✅ CORRECT - TN] Clip: clip_26 | Score: 0.29
+[✅ CORRECT - TN] Clip: clip_27 | Score: 0.26
+[✅ CORRECT - TN] Clip: clip_29 | Score: 0.26
+[✅ CORRECT - TN] Clip: clip_33 | Score: 0.49
+[✅ CORRECT - TN] Clip: clip_34 | Score: 0.00
+[✅ CORRECT - TN] Clip: clip_35 | Score: 0.00
+[❌ FAIL - FP] Clip: clip_32 | Score: 0.50
+[✅ CORRECT - TN] Clip: clip_25 | Score: 0.27
+[✅ CORRECT - TN] Clip: clip_22 | Score: 0.35
+[✅ CORRECT - TN] Clip: clip_40 | Score: 0.43
+[✅ CORRECT - TN] Clip: clip_23 | Score: 0.27
+[✅ CORRECT - TN] Clip: clip_24 | Score: 0.33
+[✅ CORRECT - TN] Clip: clip_37 | Score: 0.48
+[✅ CORRECT - TN] Clip: clip_30 | Score: 0.50
+[❌ FAIL - FP] Clip: clip_39 | Score: 0.54
+[✅ CORRECT - TN] Clip: clip_38 | Score: 0.48
+[❌ FAIL - FP] Clip: clip_31 | Score: 0.54
+[✅ CORRECT - TN] Clip: clip_36 | Score: 0.50
+
+Evaluating Category: HANDSHAKE
+[❌ FAIL - FN] Clip: clip_10 | Score: 0.36
+[✅ CORRECT - TP] Clip: clip_28 | Score: 0.50
+[❌ FAIL - FN] Clip: clip_17 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_21 | Score: 0.30
+[❌ FAIL - FN] Clip: clip_19 | Score: 0.48
+[✅ CORRECT - TP] Clip: clip_26 | Score: 0.51
+[❌ FAIL - FN] Clip: clip_18 | Score: 0.48
+[✅ CORRECT - TP] Clip: clip_27 | Score: 0.54
+[❌ FAIL - FN] Clip: clip_20 | Score: 0.44
+[✅ CORRECT - TP] Clip: clip_29 | Score: 0.57
+[❌ FAIL - FN] Clip: clip_16 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_11 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_4 | Score: 0.37
+[❌ FAIL - FN] Clip: clip_3 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_2 | Score: 0.37
+[❌ FAIL - FN] Clip: clip_5 | Score: 0.36
+[✅ CORRECT - TP] Clip: clip_33 | Score: 0.51
+[✅ CORRECT - TP] Clip: clip_34 | Score: 0.56
+[✅ CORRECT - TP] Clip: clip_35 | Score: 0.58
+[✅ CORRECT - TP] Clip: clip_32 | Score: 0.50
+[❌ FAIL - FN] Clip: clip_14 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_13 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_25 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_22 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_40 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_23 | Score: 0.41
+E0000 00:00:1777934724.654551 14284192 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-05-04T18:59:24.647216-04:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+[❌ FAIL - FN] Clip: clip_24 | Score: 0.46
+[❌ FAIL - FN] Clip: clip_12 | Score: 0.37
+[❌ FAIL - FN] Clip: clip_15 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_41 | Score: 0.00
+[❌ FAIL - FN] Clip: clip_9 | Score: 0.38
+[❌ FAIL - FN] Clip: clip_0 | Score: 0.37
+[❌ FAIL - FN] Clip: clip_7 | Score: 0.37
+[❌ FAIL - FN] Clip: clip_6 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_1 | Score: 0.36
+[❌ FAIL - FN] Clip: clip_8 | Score: 0.35
+[❌ FAIL - FN] Clip: clip_37 | Score: 0.45
+[❌ FAIL - FN] Clip: clip_30 | Score: 0.46
+[❌ FAIL - FN] Clip: clip_39 | Score: 0.34
+[❌ FAIL - FN] Clip: clip_38 | Score: 0.47
+[✅ CORRECT - TP] Clip: clip_31 | Score: 0.51
+[❌ FAIL - FN] Clip: clip_36 | Score: 0.43
+
+==================================================
+🏁 HYBRID BENCHMARK COMPLETE
+==================================================
+--- 📈 STATISTICAL METRICS ---
+Total Clips Evaluated: 62
+Accuracy:  41.94%
+Precision: 75.00%
+Recall:    21.43%
+
+--- ⚡ HARDWARE METRICS ---
+Total Frames Processed : 4950
+Avg Latency per Frame  : 22.40 ms
+Estimated Real-Time FPS: 44.6 FPS
+==================================================
+
+I noticed the way we are selecting hand for cropping is diff from how we select hand while benchmarking (using z-index)
+so trying to crop hand by choosing hand using z-index similar to benchmarking.
+why?
+because to see if cropping just hand will help with accuracy since the tiny cnn model doesn't have many neurons to track
+all context data when fed complete image also we shrink image to 160*160 so the hand might not be most highlighted feature
+of the image.
+
+train_dataset_v3_cropped contains cropped images, many contains hand which are not the active hand.
+why not use same other features like thumb, tilt etc to crop the hand? 
+y-axis might not work because if the receiving person is taller then hand will raise higher
+
+Loading dataset...
+Found 437 files belonging to 2 classes.
+Using 350 files for training.
+Found 437 files belonging to 2 classes.
+Using 87 files for validation.
+
+🚀 Starting Training...
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 4s 181ms/step - accuracy: 0.5371 - loss: 0.8090 - val_accuracy: 0.5057 - val_loss: 0.6981
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 163ms/step - accuracy: 0.5914 - loss: 0.6618 - val_accuracy: 0.4828 - val_loss: 0.7122
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 162ms/step - accuracy: 0.5857 - loss: 0.6622 - val_accuracy: 0.4828 - val_loss: 0.7242
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 162ms/step - accuracy: 0.5743 - loss: 0.6611 - val_accuracy: 0.4828 - val_loss: 0.7383
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 165ms/step - accuracy: 0.6343 - loss: 0.6516 - val_accuracy: 0.4828 - val_loss: 0.7653
+Epoch 6/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 172ms/step - accuracy: 0.6371 - loss: 0.6246 - val_accuracy: 0.4828 - val_loss: 0.8092
+Epoch 7/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 218ms/step - accuracy: 0.6171 - loss: 0.6562 - val_accuracy: 0.4828 - val_loss: 0.8391
+Epoch 8/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 170ms/step - accuracy: 0.6000 - loss: 0.6523 - val_accuracy: 0.4828 - val_loss: 0.8516
+Epoch 9/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 163ms/step - accuracy: 0.6200 - loss: 0.6320 - val_accuracy: 0.4828 - val_loss: 0.8863
+Epoch 10/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 164ms/step - accuracy: 0.6400 - loss: 0.6204 - val_accuracy: 0.4828 - val_loss: 0.9237
+Epoch 11/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 163ms/step - accuracy: 0.6686 - loss: 0.6162 - val_accuracy: 0.4828 - val_loss: 0.9462
+Epoch 12/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 163ms/step - accuracy: 0.6514 - loss: 0.6197 - val_accuracy: 0.4828 - val_loss: 0.9634
+Epoch 13/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 164ms/step - accuracy: 0.6829 - loss: 0.6067 - val_accuracy: 0.4828 - val_loss: 0.9510
+Epoch 14/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 162ms/step - accuracy: 0.6914 - loss: 0.5958 - val_accuracy: 0.4828 - val_loss: 0.9162
+Epoch 15/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 164ms/step - accuracy: 0.6457 - loss: 0.6197 - val_accuracy: 0.4828 - val_loss: 0.8914
+
+the model gave up, I think the data augmentation was aggressive for cropped hand than full image
+
+==================================================
+🧠 TRAINING CNN: FULL FRAMES + HEAVY AUGMENTATION
+==================================================
+Loading dataset...
+Found 437 files belonging to 2 classes.
+Using 350 files for training.
+Found 437 files belonging to 2 classes.
+Using 87 files for validation.
+
+🚀 Starting Training...
+Epoch 1/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 3s 181ms/step - accuracy: 0.6114 - loss: 0.8222 - val_accuracy: 0.4943 - val_loss: 0.7417
+Epoch 2/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 168ms/step - accuracy: 0.6629 - loss: 0.6403 - val_accuracy: 0.4943 - val_loss: 0.7149
+Epoch 3/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 173ms/step - accuracy: 0.7314 - loss: 0.5610 - val_accuracy: 0.4943 - val_loss: 0.7064
+Epoch 4/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 172ms/step - accuracy: 0.7371 - loss: 0.5216 - val_accuracy: 0.4943 - val_loss: 0.7206
+Epoch 5/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 172ms/step - accuracy: 0.7800 - loss: 0.4852 - val_accuracy: 0.4828 - val_loss: 0.7530
+Epoch 6/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 182ms/step - accuracy: 0.7914 - loss: 0.4251 - val_accuracy: 0.4828 - val_loss: 0.7697
+Epoch 7/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 173ms/step - accuracy: 0.8286 - loss: 0.4014 - val_accuracy: 0.4828 - val_loss: 0.8217
+Epoch 8/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 178ms/step - accuracy: 0.8314 - loss: 0.3977 - val_accuracy: 0.4828 - val_loss: 0.7930
+Epoch 9/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 173ms/step - accuracy: 0.8457 - loss: 0.3678 - val_accuracy: 0.4828 - val_loss: 0.8312
+Epoch 10/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 172ms/step - accuracy: 0.8543 - loss: 0.3422 - val_accuracy: 0.4828 - val_loss: 0.8672
+Epoch 11/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 170ms/step - accuracy: 0.8829 - loss: 0.3213 - val_accuracy: 0.4943 - val_loss: 0.7182
+Epoch 12/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 174ms/step - accuracy: 0.8571 - loss: 0.3279 - val_accuracy: 0.4828 - val_loss: 1.0039
+Epoch 13/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 174ms/step - accuracy: 0.8914 - loss: 0.3036 - val_accuracy: 0.4828 - val_loss: 1.1716
+Epoch 14/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 173ms/step - accuracy: 0.8771 - loss: 0.2702 - val_accuracy: 0.4828 - val_loss: 0.9300
+Epoch 15/15
+11/11 ━━━━━━━━━━━━━━━━━━━━ 2s 181ms/step - accuracy: 0.8914 - loss: 0.2956 - val_accuracy: 0.4943 - val_loss: 0.8326
+
+IDEA:
+why not use same thumb open/close, palm tilt to select the hand in crop dataset? because I see some images like hand resting on a leg are selected since it satisfies the z-index.
+also another idea gemini suggested is ranking the hands in the frame according to thumb state, z-index, palm tilt and picking best hand - I think this is good + we can store the non best hand in none category and use it for training?
+
+Gemini: it is a trap! Remember the "Waste of Brain Space" rule we just talked about:
+If you take a hand resting on a leg (the lowest score) and put it in the none folder, you are spending CNN neurons teaching it to recognize a resting hand. But in your live robot, Stage 1 (MediaPipe) will never pass a resting hand to the CNN anyway.

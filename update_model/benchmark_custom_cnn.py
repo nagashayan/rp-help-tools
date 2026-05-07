@@ -36,7 +36,7 @@ REACH_MIN = 0.03
 TILT_MIN = 15           
 TILT_MAX = 165          
 THUMB_MIN = 0       # <-- OPTION B: The Strict Intent Prehensile Gate
-CNN_THRESHOLD = 0.50    
+CNN_THRESHOLD = 0.50
 
 # Tracking Variables
 total_pipeline_time = 0.0
