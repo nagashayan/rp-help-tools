@@ -1,6 +1,0 @@
-mediapipe-model-maker
-# label-studio for data labeling
-tensorflow
-tensorflow-metal # for graphic acceleration on Mac
-mediapipe
-psutil
