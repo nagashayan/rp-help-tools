@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pixel 9 - Edge NPU Inference</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: #222;
+            color: white;
+            padding: 10px;
+        }
+
+        #status {
+            font-size: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+            color: yellow;
+        }
+
+        #debug {
+            font-size: 16px;
+            color: #aaa;
+            margin-top: 5px;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+
+        img {
+            width: 100%;
+            max-width: 600px;
+            border: 3px solid #555;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Wizard of Oz - Inference Only</h2>
+    <img id="mac-video" src="/video_feed" crossorigin="anonymous">
+    <canvas id="hidden_canvas" style="display: none;"></canvas>
+
+    <div id="status">Initializing System...</div>
+    <div id="debug">Buffer: 0/30 frames</div>
+
+    <script>
+        ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
+        ort.env.wasm.numThreads = 1;
+
+        const videoImg = document.getElementById('mac-video');
+        const hiddenCanvas = document.getElementById('hidden_canvas');
+        const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
+
+        const statusDiv = document.getElementById('status');
+        const debugDiv = document.getElementById('debug');
+
+        let ortSession = null;
+        let sequenceBuffer = [];
+        let lastKnownLandmarks = new Array(63).fill(0.0);
+
+        // --- STEP 1: Load NPU Model ---
+        async function loadModel() {
+            const cacheBuster = '?t=' + new Date().getTime();
+            const [modelResponse, dataResponse] = await Promise.all([
+                fetch('/temporal_cnn_monolithic.onnx' + cacheBuster),
+                fetch('/temporal_cnn_monolithic.onnx.data' + cacheBuster)
+            ]);
+
+            if (!modelResponse.ok) throw new Error("Missing .onnx file");
+            if (!dataResponse.ok) throw new Error("Missing .data file");
+
+            const modelBuffer = await modelResponse.arrayBuffer();
+            const dataBuffer = await dataResponse.arrayBuffer();
+
+            const sessionOptions = {
+                executionProviders: ['wasm'],
+                intraOpNumThreads: 1,
+                interOpNumThreads: 1,
+                externalData: [{ data: new Uint8Array(dataBuffer), path: 'temporal_cnn_monolithic.onnx.data' }]
+            };
+
+            ortSession = await ort.InferenceSession.create(modelBuffer, sessionOptions);
+        }
+
+        // --- STEP 2: Configure MediaPipe ---
+        const hands = new Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }
+        });
+        hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.5 });
+
+        hands.onResults(async (results) => {
+            let currentLandmarks = [];
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let lm_list = results.multiHandLandmarks[0];
+                for (let i = 0; i < 21; i++) {
+                    currentLandmarks.push(lm_list[i].x, lm_list[i].y, lm_list[i].z);
+                }
+                lastKnownLandmarks = currentLandmarks;
+            } else {
+                currentLandmarks = lastKnownLandmarks;
+            }
+
+            sequenceBuffer.push(currentLandmarks);
+            if (sequenceBuffer.length > 30) sequenceBuffer.shift();
+
+            debugDiv.innerText = `Buffer: ${sequenceBuffer.length}/30 frames`;
+
+            if (sequenceBuffer.length === 30 && ortSession) {
+                let flatData = new Float32Array(1 * 63 * 30);
+                for (let feat = 0; feat < 63; feat++) {
+                    for (let seq = 0; seq < 30; seq++) {
+                        flatData[feat * 30 + seq] = sequenceBuffer[seq][feat];
+                    }
+                }
+                const tensor = new ort.Tensor('float32', flatData, [1, 63, 30]);
+
+                try {
+                    const output = await ortSession.run({ 'input': tensor });
+                    const logits = output['output'].data;
+                    let exp0 = Math.exp(logits[0]);
+                    let exp1 = Math.exp(logits[1]);
+                    let prob1 = exp1 / (exp0 + exp1);
+                    let percent = (prob1 * 100).toFixed(1);
+
+                    if (prob1 > 0.80) {
+                        statusDiv.innerText = `HANDSHAKE! (${percent}%)`;
+                        statusDiv.style.color = "lime";
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    } else {
+                        statusDiv.innerText = `Observing... (${percent}%)`;
+                        statusDiv.style.color = "white";
+                    }
+                } catch (inferError) {
+                    console.error(inferError);
+                }
+            }
+        });
+
+        // --- STEP 3: Video Loop ---
+        async function processVideoFeed() {
+            if (videoImg.naturalWidth > 0 && videoImg.naturalHeight > 0) {
+                try {
+                    hiddenCanvas.width = videoImg.naturalWidth;
+                    hiddenCanvas.height = videoImg.naturalHeight;
+                    hiddenCtx.drawImage(videoImg, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+
+                    await hands.send({ image: hiddenCanvas });
+                } catch (e) {
+                    // If Chrome blocks the canvas, PRINT IT TO THE PHONE SCREEN
+                    debugDiv.innerText = "Tracker Error: " + e.message;
+                    debugDiv.style.color = "red";
+                }
+            }
+            setTimeout(processVideoFeed, 33);
+        }
+
+        // --- STRICT BOOT SEQUENCE ---
+        async function bootSystem() {
+            try {
+                statusDiv.innerText = "1/2: Loading NPU Engine...";
+                await loadModel();
+
+                statusDiv.innerText = "2/2: Downloading Hand Tracker (Please wait 10s)...";
+                // Force MediaPipe to fully download and compile BEFORE we send video
+                await hands.initialize();
+
+                statusDiv.innerText = "All Systems Go! Step into frame.";
+                statusDiv.style.color = "lightgreen";
+
+                processVideoFeed();
+            } catch (error) {
+                statusDiv.innerText = "Boot Failed: " + error.message;
+                statusDiv.style.color = "red";
+            }
+        }
+
+        // Start everything
+        bootSystem();
+
+    </script>
+</body>
+
+</html>

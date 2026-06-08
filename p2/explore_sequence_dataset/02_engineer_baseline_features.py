@@ -70,9 +70,9 @@ def calculate_baseline_features(df):
     wrist_dy = df['landmark_0_y'].diff().fillna(0)
     euclidean_drift = np.sqrt(wrist_dx**2 + wrist_dy**2)
     
-    # FEATURE 3: Reach (Z-axis Differential)
-    # Math: Z-coordinate of Middle Fingertip (12) - Z-coordinate of Wrist (0)
-    features['reach_z'] = df['landmark_12_z'] - df['landmark_0_z']
+    # # FEATURE 3: Reach (Z-axis Differential)
+    # # Math: Z-coordinate of Middle Fingertip (12) - Z-coordinate of Wrist (0)
+    # features['reach_z'] = df['landmark_12_z'] - df['landmark_0_z']
 
     # Use a temporary dataframe to safely apply the rolling window per video clip
     df_temp = pd.DataFrame({'video_name': df['video_name'], 'drift': euclidean_drift})

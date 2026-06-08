@@ -168,3 +168,7 @@ p2/dataset_landmarks/
 
 # vscode
 .vscode/
+p2/.venv_mp/*
+*.onnx
+*.onnx.data
+*.pth
