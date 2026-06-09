@@ -15,7 +15,7 @@
         }
 
         #status {
-            font-size: 20px;
+            font-size: 24px;
             margin-top: 15px;
             font-weight: bold;
             color: yellow;
@@ -26,10 +26,10 @@
             color: #aaa;
             margin-top: 5px;
             font-family: monospace;
-            word-wrap: break-word;
         }
 
-        img {
+        /* Add a visual container so you know the video is actually updating */
+        #preview_canvas {
             width: 100%;
             max-width: 600px;
             border: 3px solid #555;
@@ -40,9 +40,9 @@
 
 <body>
 
-    <h2>Wizard of Oz - Inference Only</h2>
-    <img id="mac-video" src="/video_feed" crossorigin="anonymous">
-    <canvas id="hidden_canvas" style="display: none;"></canvas>
+    <h2>Wizard of Oz - Stable Snapshot</h2>
+
+    <canvas id="preview_canvas"></canvas>
 
     <div id="status">Initializing System...</div>
     <div id="debug">Buffer: 0/30 frames</div>
@@ -51,18 +51,17 @@
         ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/";
         ort.env.wasm.numThreads = 1;
 
-        const videoImg = document.getElementById('mac-video');
-        const hiddenCanvas = document.getElementById('hidden_canvas');
-        const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
-
         const statusDiv = document.getElementById('status');
         const debugDiv = document.getElementById('debug');
+
+        // We recycle ONE canvas to prevent memory leaks
+        const previewCanvas = document.getElementById('preview_canvas');
+        const previewCtx = previewCanvas.getContext('2d', { willReadFrequently: true });
 
         let ortSession = null;
         let sequenceBuffer = [];
         let lastKnownLandmarks = new Array(63).fill(0.0);
 
-        // --- STEP 1: Load NPU Model ---
         async function loadModel() {
             const cacheBuster = '?t=' + new Date().getTime();
             const [modelResponse, dataResponse] = await Promise.all([
@@ -70,28 +69,20 @@
                 fetch('/temporal_cnn_monolithic.onnx.data' + cacheBuster)
             ]);
 
-            if (!modelResponse.ok) throw new Error("Missing .onnx file");
-            if (!dataResponse.ok) throw new Error("Missing .data file");
-
-            const modelBuffer = await modelResponse.arrayBuffer();
-            const dataBuffer = await dataResponse.arrayBuffer();
+            if (!modelResponse.ok) throw new Error("Missing .onnx");
+            if (!dataResponse.ok) throw new Error("Missing .data");
 
             const sessionOptions = {
                 executionProviders: ['wasm'],
                 intraOpNumThreads: 1,
                 interOpNumThreads: 1,
-                externalData: [{ data: new Uint8Array(dataBuffer), path: 'temporal_cnn_monolithic.onnx.data' }]
+                externalData: [{ data: new Uint8Array(await dataResponse.arrayBuffer()), path: 'temporal_cnn_monolithic.onnx.data' }]
             };
 
-            ortSession = await ort.InferenceSession.create(modelBuffer, sessionOptions);
+            ortSession = await ort.InferenceSession.create(await modelResponse.arrayBuffer(), sessionOptions);
         }
 
-        // --- STEP 2: Configure MediaPipe ---
-        const hands = new Hands({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-            }
-        });
+        const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
         hands.setOptions({ maxNumHands: 1, minDetectionConfidence: 0.5 });
 
         hands.onResults(async (results) => {
@@ -118,11 +109,12 @@
                         flatData[feat * 30 + seq] = sequenceBuffer[seq][feat];
                     }
                 }
-                const tensor = new ort.Tensor('float32', flatData, [1, 63, 30]);
 
                 try {
+                    const tensor = new ort.Tensor('float32', flatData, [1, 63, 30]);
                     const output = await ortSession.run({ 'input': tensor });
                     const logits = output['output'].data;
+
                     let exp0 = Math.exp(logits[0]);
                     let exp1 = Math.exp(logits[1]);
                     let prob1 = exp1 / (exp0 + exp1);
@@ -142,47 +134,59 @@
             }
         });
 
-        // --- STEP 3: Video Loop ---
-        async function processVideoFeed() {
-            if (videoImg.naturalWidth > 0 && videoImg.naturalHeight > 0) {
-                try {
-                    hiddenCanvas.width = videoImg.naturalWidth;
-                    hiddenCanvas.height = videoImg.naturalHeight;
-                    hiddenCtx.drawImage(videoImg, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+        // 4. Memory-Safe Polling Loop
+        // We only create ONE image object and reuse it forever
+        const snapshotImg = new Image();
 
-                    await hands.send({ image: hiddenCanvas });
-                } catch (e) {
-                    // If Chrome blocks the canvas, PRINT IT TO THE PHONE SCREEN
-                    debugDiv.innerText = "Tracker Error: " + e.message;
-                    debugDiv.style.color = "red";
+        snapshotImg.onload = async () => {
+            try {
+                // Resize canvas to match the Mac's camera resolution
+                if (previewCanvas.width !== snapshotImg.width) {
+                    previewCanvas.width = snapshotImg.width;
+                    previewCanvas.height = snapshotImg.height;
                 }
-            }
-            setTimeout(processVideoFeed, 33);
-        }
 
-        // --- STRICT BOOT SEQUENCE ---
+                // Paint the image to the canvas
+                previewCtx.drawImage(snapshotImg, 0, 0);
+
+                // Hand the safe canvas to MediaPipe
+                await hands.send({ image: previewCanvas });
+            } catch (e) {
+                debugDiv.innerText = "Tracker Error: " + e.message;
+            }
+
+            // Wait ~33ms, then fetch the next frame
+            setTimeout(() => {
+                snapshotImg.src = '/snapshot?t=' + new Date().getTime();
+            }, 33);
+        };
+
+        snapshotImg.onerror = () => {
+            // If the Mac drops a frame, just try again
+            setTimeout(() => {
+                snapshotImg.src = '/snapshot?t=' + new Date().getTime();
+            }, 33);
+        };
+
         async function bootSystem() {
             try {
-                statusDiv.innerText = "1/2: Loading NPU Engine...";
+                statusDiv.innerText = "1/2: Loading NPU...";
                 await loadModel();
-
-                statusDiv.innerText = "2/2: Downloading Hand Tracker (Please wait 10s)...";
-                // Force MediaPipe to fully download and compile BEFORE we send video
+                statusDiv.innerText = "2/2: Loading Tracker (Wait 10s)...";
                 await hands.initialize();
 
                 statusDiv.innerText = "All Systems Go! Step into frame.";
                 statusDiv.style.color = "lightgreen";
 
-                processVideoFeed();
+                // Kick off the loop
+                snapshotImg.src = '/snapshot?t=' + new Date().getTime();
             } catch (error) {
                 statusDiv.innerText = "Boot Failed: " + error.message;
                 statusDiv.style.color = "red";
             }
         }
 
-        // Start everything
         bootSystem();
-
     </script>
 </body>
 

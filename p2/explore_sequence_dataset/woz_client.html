@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wizard of Oz - Pager</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: #111;
+            color: white;
+            padding: 50px;
+        }
+
+        button {
+            padding: 20px 40px;
+            font-size: 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+
+        #status {
+            font-size: 30px;
+            margin-top: 40px;
+            font-weight: bold;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Wizard of Oz Actuator</h2>
+    <button onclick="startPolling()">Tap to Connect</button>
+    <div id="status">Waiting to start...</div>
+
+    <script>
+        let isVibrating = false;
+
+        async function pollServer() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+
+                const statusDiv = document.getElementById('status');
+
+                if (data.state === "HANDSHAKE") {
+                    statusDiv.innerText = "🤝 HANDSHAKE DETECTED!";
+                    statusDiv.style.color = "lime";
+
+                    if (!isVibrating) {
+                        isVibrating = true;
+                        // Change the values to exceed the 1-second threshold
+                        if (navigator.vibrate) navigator.vibrate([1005, 200, 1005]);
+
+                        // Prevent the motor from buzzing constantly, wait 2 seconds before resetting
+                        setTimeout(() => { isVibrating = false; }, 2000);
+                    }
+                } else {
+                    statusDiv.innerText = "Observing...";
+                    statusDiv.style.color = "white";
+                }
+            } catch (e) {
+                document.getElementById('status').innerText = "Disconnected from Mac.";
+                document.getElementById('status').style.color = "red";
+            }
+        }
+
+        function startPolling() {
+            document.getElementById('status').innerText = "Connected! Observing...";
+            document.getElementById('status').style.color = "white";
+            // Poll the Mac 10 times a second
+            setInterval(pollServer, 100);
+        }
+    </script>
+</body>
+
+</html>
