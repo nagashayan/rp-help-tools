@@ -116,3 +116,10 @@ The Pixel 9 Brain: A single HTML file containing MediaPipe JS and ONNX Runtime W
 06_export_onnx.py
 07_mac_server.py
 index.html
+
+Wizard of oz study:
+source ../.venv_mp/bin/activate
+python 08_woz_master.py
+08_woz_master.py
+and run app on the phone by enter ip address
+you can switch b/w AI mode and normal mode using 'm' letter

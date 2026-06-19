@@ -64,20 +64,21 @@
 
         async function loadModel() {
             const cacheBuster = '?t=' + new Date().getTime();
-            const [modelResponse, dataResponse] = await Promise.all([
-                fetch('/temporal_cnn_monolithic.onnx' + cacheBuster),
-                fetch('/temporal_cnn_monolithic.onnx.data' + cacheBuster)
-            ]);
-
+            const modelResponse = await fetch('/temporal_cnn_monolithic.onnx' + cacheBuster);
             if (!modelResponse.ok) throw new Error("Missing .onnx");
-            if (!dataResponse.ok) throw new Error("Missing .data");
 
             const sessionOptions = {
                 executionProviders: ['wasm'],
                 intraOpNumThreads: 1,
                 interOpNumThreads: 1,
-                externalData: [{ data: new Uint8Array(await dataResponse.arrayBuffer()), path: 'temporal_cnn_monolithic.onnx.data' }]
             };
+
+            const dataResponse = await fetch('/temporal_cnn_monolithic.onnx.data' + cacheBuster);
+            if (dataResponse.ok) {
+                sessionOptions.externalData = [
+                    { data: new Uint8Array(await dataResponse.arrayBuffer()), path: 'temporal_cnn_monolithic.onnx.data' }
+                ];
+            }
 
             ortSession = await ort.InferenceSession.create(await modelResponse.arrayBuffer(), sessionOptions);
         }

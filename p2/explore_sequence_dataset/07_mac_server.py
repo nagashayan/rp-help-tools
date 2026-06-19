@@ -11,7 +11,7 @@ Purpose:
 """
 
 import cv2
-from flask import Flask, Response, send_file, send_from_directory
+from flask import Flask, Response, jsonify, send_file, send_from_directory
 import socket
 import threading
 
@@ -65,6 +65,12 @@ def snapshot():
     # Compress the tiny image into a JPEG
     ret, buffer = cv2.imencode('.jpg', small_frame)
     return Response(buffer.tobytes(), mimetype='image/jpeg')
+
+@app.route('/health')
+def health():
+    ready = latest_frame is not None and camera.isOpened()
+    status_code = 200 if ready else 503
+    return jsonify({"ready": ready}), status_code
 
 if __name__ == "__main__":
     mac_ip = get_local_ip()
