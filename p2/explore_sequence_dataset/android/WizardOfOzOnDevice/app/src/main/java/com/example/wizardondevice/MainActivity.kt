@@ -1,6 +1,7 @@
 package com.example.wizardondevice
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ipInput: EditText
     private lateinit var connectButton: Button
     private lateinit var pocketModeButton: Button
+    private lateinit var sourceModeButton: Button
     private lateinit var previewImage: ImageView
     private lateinit var overlayView: OverlayView
     private lateinit var stateText: TextView
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         ipInput = findViewById(R.id.ipInput)
         connectButton = findViewById(R.id.connectButton)
         pocketModeButton = findViewById(R.id.pocketModeButton)
+        sourceModeButton = findViewById(R.id.sourceModeButton)
         previewImage = findViewById(R.id.previewImage)
         overlayView = findViewById(R.id.overlayView)
         stateText = findViewById(R.id.stateText)
@@ -87,7 +90,7 @@ class MainActivity : AppCompatActivity() {
                 if (host.isNotEmpty()) {
                     startPipeline(host)
                 } else {
-                    connectionText.text = "Enter the Mac IP address."
+                    connectionText.text = "Enter the source phone or Mac IP address."
                     connectionText.setTextColor(getColor(R.color.warning))
                 }
             }
@@ -99,6 +102,10 @@ class MainActivity : AppCompatActivity() {
             val params = window.attributes
             params.screenBrightness = 0.0f
             window.attributes = params
+        }
+
+        sourceModeButton.setOnClickListener {
+            startActivity(Intent(this, PhoneCameraSourceActivity::class.java))
         }
 
         pocketModeOverlay.setOnLongClickListener {
@@ -120,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 val healthy = frameSource.checkHealth(host)
                 if (!healthy) {
                     withContext(Dispatchers.Main) {
-                        renderConnectionFailure("Mac camera server is not ready.")
+                        renderConnectionFailure("Camera source is not ready.")
                     }
                     return@launch
                 }
@@ -295,7 +302,7 @@ class MainActivity : AppCompatActivity() {
         connectButton.text = "Connect"
         connectButton.isEnabled = true
         pocketModeButton.visibility = View.GONE
-        connectionText.text = "Waiting for Mac server"
+        connectionText.text = "Waiting for camera source"
         connectionText.setTextColor(getColor(R.color.text_secondary))
         trackerText.text = "Tracker: idle"
         bufferText.text = "Buffer: 0/30"

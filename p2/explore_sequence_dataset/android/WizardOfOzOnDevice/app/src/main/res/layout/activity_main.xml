@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Mac streams frames. Android tracks the hand and runs the classifier locally."
+                android:text="Connect to a Mac or another phone that serves /snapshot frames. Android tracks the hand and runs the classifier locally."
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
@@ -38,7 +38,7 @@
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/accent"
                 android:gravity="center_vertical"
-                android:hint="Mac IP address (for example 192.168.1.223)"
+                android:hint="Source IP address (for example 192.168.1.223)"
                 android:inputType="textUri"
                 android:paddingHorizontal="16dp"
                 android:textColor="@color/text_primary"
@@ -70,6 +70,15 @@
                     android:textColor="@color/black"
                     android:visibility="gone" />
             </LinearLayout>
+
+            <Button
+                android:id="@+id/sourceModeButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/surface_variant"
+                android:text="Open Camera Source Mode"
+                android:textColor="@color/text_primary" />
 
             <FrameLayout
                 android:layout_width="match_parent"
